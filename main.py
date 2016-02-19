@@ -93,13 +93,13 @@ def call(method='', params=None) :
 
 # Default Search
 def search(query, cat_id=CAT_MOVIE, terms=None):
-    provider.notify(message=str(query).replace('+',' ').title(), header="Quasar AlexP's [COLOR FF18F6F3]t411[/COLOR] Provider" , time=1500, image=icon)
+    provider.notify(message=str(query).replace('+',' ').title(), header="Quasar AlexP's [COLOR FF18F6F3]t411[/COLOR] Provider" , time=3000, image=icon)
     result = []
     threads = []
     q = Queue.Queue()
     provider.log.debug("QUERY : %s" % query)
     query = query.replace('+','%20')
-    response = call('/torrents/search/%s&?limit=50&cid=%s%s' % (query, cat_id, terms))
+    response = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, cat_id, terms))
     provider.log.debug("Search results : %s" % response)
     # quasar send GET requests & t411 api needs POST
     # Must use the bencode tool :(
