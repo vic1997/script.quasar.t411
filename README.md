@@ -1,2 +1,9 @@
-# script.quasar.t411
-Provider Quasar pour T411
+script.quasar.t411
+=================
+
+T411 (French) Pulsar provider for Kodi
+
+History : 
+
+Version 1.0
+- Initial version for Quasar v0.9.22

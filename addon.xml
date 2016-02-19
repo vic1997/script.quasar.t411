@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.quasar.t411" name="Quasar AlexP's [COLOR FF18F6F3]t411[/COLOR] Provider" version="1.0" provider-name="AlexP,Sheppy">
+  <requires>
+    <import addon="xbmc.python" version="2.14.0"/>
+    <import addon="plugin.video.quasar" version="0.3"/>
+  </requires>
+  <extension point="xbmc.python.script" library="main.py">
+    <provides>executable</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">Quasar [COLOR FF18F6F3]t411[/COLOR] Provider</summary>
+    <description lang="en">
+      Provides Quasar sources from the french tracker T411.
+	  Based on Sheppy original's code (https://github.com/Sheppounet/script.pulsar.cpb).
+    </description>
+    <description lang="fr">
+      Fournit des sources multimédia pour l'addon Quasar à partir du tracker français T411.
+	  Basé sur le code de Sheppy (https://github.com/Sheppounet/script.pulsar.cpb).
+	  - Filtres de la qualitée vidéo pour films et séries
+	  - Filtres de la langue (VO,VF,Multi...)
+	  - Remplacement auto de la clé de compte T411
+    </description>
+    <language>fr</language>
+    <platform>all</platform>
+    <website>https://github.com/likeitneverwentaway/script.quasar.t411</website>
+    <disclaimer lang="en">Some parts of the files provides by this addon can be illegal in your country. </disclaimer>
+    <disclaimer lang="fr">Le téléchargement de certaines sources obtenues par cette extension peut être illégal dans votre pays selon les lois en vigueur.</disclaimer>
+  </extension>
+</addon>
