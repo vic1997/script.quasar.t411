@@ -225,10 +225,10 @@ def torrent2magnet(t, q, token):
     torrentdl = '/torrents/download/%s' % t["id"]
     response = provider.POST('%s%s' % (API_URL, torrentdl), headers={'Authorization': token})
     torrent = response.data
-    # if passkey is not None:
-    #     key = re.compile('download([^"]+)announce').findall(torrent)
-    #     key = key[0].split('/')[1]
-    #     torrent=torrent.replace(key,passkey)
+     if passkey is not None:
+         key = re.compile('download([^"]+)announce').findall(torrent)
+         key = key[0].split('/')[1]
+         torrent=torrent.replace(key,passkey)
     metadata = bencode.bdecode(torrent)
     hashcontents = bencode.bencode(metadata['info'])
     digest = hashlib.sha1(hashcontents).hexdigest()
