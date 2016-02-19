@@ -2,7 +2,7 @@
 # Quasar T411 (French) Provider for Kodi
 Fourni du contenu depuis T411 pour le plugin Quasar sur Kodi
 Basé sur le code de [Sheppy](https://github.com/Sheppounet/script.pulsar.cpb)
-## Info
+## Infos
 
 Version 1.0 - Quasar v0.9.22
 - Filtres pour la qualité vidéo, séparés pour les films et les séries
@@ -14,5 +14,5 @@ Version 1.0 - Quasar v0.9.22
 
 :point_right: [Release](https://github.com/likeitneverwentaway/script.quasar.t411/releases)
 
-## History :
+## Changelog :
 - 1.0 : release initiale
