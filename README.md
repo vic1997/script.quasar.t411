@@ -18,5 +18,6 @@ Version 1.1 - Quasar v0.9.22
 v1.1 :
 - Support initial recherche saison complète
 - Update description, id
+
 v1.0 :
 - Release initiale
