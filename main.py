@@ -186,7 +186,42 @@ def search_episode(episode):
         terms += '&term[46][]=%s' % real_ep
     
     return search(episode['title'], CAT_TV, terms)
+    
 
+def search_season(season):
+    terms = pref_terms
+    
+    if filtre_serie:
+        termList = [[]] * 18
+        # 7 : Video - Qualite
+        termList[7] = [8,10,11,12,15,16,17,18,19,1162,1174,1175,1182,1208,1218,1233]
+        # 9 : Video - Type
+        termList[9] = [22,23,24,1045]
+        # 17 : Video - Langue
+        termList[17] = [1209,1210,1211,1212,1213,1214,1215,1216]
+    
+        # Get all settings correspondance
+        for idx, term in enumerate(termList):
+            for iTerm in term:
+                if provider.ADDON.getSetting('%s_s' % iTerm) == 'true':
+                    pref_terms += '&term[%s][]=%s' % (idx, iTerm)
+                    
+    terms += &term[46][]=936  # saison complete
+    
+    if season['season'] < 25  or 27 < season['season'] < 31 :
+        real_s = int(season['season']) + 967
+        
+    if season['season'] == 25 :
+        real_s = 992
+        
+    if 25 < season['season'] < 28 :
+        real_s = int(season['season']) + 966
+    
+    terms += '&term[45][]=%s' % real_s
+    
+    return search(season['season'], CAT_TV, terms)
+    
+    
 def search_movie(movie):
     pref_terms = ''
     if filtre_film:
