@@ -206,7 +206,7 @@ def search_season(season):
                 if provider.ADDON.getSetting('%s_s' % iTerm) == 'true':
                     pref_terms += '&term[%s][]=%s' % (idx, iTerm)
                     
-    terms += &term[46][]=936  # saison complete
+    terms += '&term[46][]=936'  # saison complete
     
     if season['season'] < 25  or 27 < season['season'] < 31 :
         real_s = int(season['season']) + 967
