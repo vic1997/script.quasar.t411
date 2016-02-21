@@ -168,7 +168,7 @@ def search_episode(episode):
             real_s = int(episode['season']) + 967
             
         if episode['season'] == 25 :
-            real_s = 992
+            real_s = 994
             
         if 25 < episode['season'] < 28 :
             real_s = int(episode['season']) + 966
@@ -214,7 +214,7 @@ def search_season(serie):
         real_s = int(serie['season']) + 967
         
     if serie['season'] == 25 :
-        real_s = 992
+        real_s = 994
         
     if 25 < serie['season'] < 28 :
         real_s = int(serie['season']) + 966
