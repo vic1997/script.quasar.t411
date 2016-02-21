@@ -10,10 +10,10 @@
   <extension point="xbmc.addon.metadata">
     <summary lang="en">Quasar [COLOR FF18F6F3]t411[/COLOR] Provider</summary>
     <description lang="en">
-      Provides Quasar sources from T411[CR]Filtres de la qualitée vidéo pour films et séries[CR]Filtres de la langue (VO,VF,Multi...)[CR]Recherche de torrents de saison complète[CR]Remplacement auto de la clé de compte T411
+      Filtres de la qualitée vidéo pour films et séries[CR]Filtres de la langue (VO,VF,Multi...)[CR]Recherche de torrents de saison complète[CR]Remplacement auto de la clé de compte T411
     </description>
     <description lang="fr">
-      Provider T411  pour Quasar[CR]Filtres de la qualitée vidéo pour films et séries[CR]Filtres de la langue (VO,VF,Multi...)[CR]Recherche de torrents de saison complète[CR]Remplacement auto de la clé de compte T411
+      Filtres de la qualitée vidéo pour films et séries[CR]Filtres de la langue (VO,VF,Multi...)[CR]Recherche de torrents de saison complète[CR]Remplacement auto de la clé de compte T411
     </description>
     <language>fr</language>
     <platform>all</platform>
