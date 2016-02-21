@@ -1,2 +1,6 @@
-Version 1.0 :
-- Version initiale
+-Version 1.1 :
+ -- Support initial recherche saison complète
+ -- Update description, id
+ -
+  Version 1.0 :
+ -- Version initiale
