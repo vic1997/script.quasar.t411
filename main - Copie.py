@@ -24,7 +24,9 @@ passkey = provider.ADDON.getSetting("passkey")
 icon = xbmcaddon.Addon().getAddonInfo('icon')
 filtre_film = provider.ADDON.getSetting("filtre_f")
 filtre_serie = provider.ADDON.getSetting("filtre_s")
-
+print('filtre',filtre_serie)
+if filtre_serie:
+    print('ntm')
 
 limit = 15 #provider.ADDON.getSetting("limit")
 
@@ -189,8 +191,10 @@ def search_episode(episode):
     return search(episode['title'], CAT_TV, terms)
     
 def search_season(serie):
+    print('season fuck',serie)
     pref_terms = ''
     if filtre_serie == 'true':
+        print('nsm')
     
         termList = [[]] * 18
         # 7 : Video - Qualite
