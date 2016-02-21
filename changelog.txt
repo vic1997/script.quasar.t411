@@ -1,3 +1,7 @@
+
+Version 1.2.1:
+- Fix recherche saison
+
 Version 1.2 :
 - Recherche de torrents de saison complète
 - Fix les filtres, typo
