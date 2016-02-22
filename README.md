@@ -1,6 +1,6 @@
 
 # Quasar T411 (French) Provider for Kodi
-Fourni du contenu depuis T411 pour le plugin Quasar sur Kodi.
+Fournit du contenu depuis T411 pour le plugin Quasar sur Kodi.
 Basé sur le code de [Sheppy](https://github.com/Sheppounet/script.pulsar.cpb)
 ## Infos
 
@@ -13,7 +13,7 @@ Version 1.2.1 - Quasar v0.9.23
 
 ## Download
 
-:point_right: [Release](https://github.com/likeitneverwentaway/script.quasar.t411/releases)
+:point_right: [Release](https://github.com/likeitneverwentaway/script.quasar.t411/releases/latest)
 
 ## Changelog :
 v1.2.1 
