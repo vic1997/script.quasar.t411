@@ -24,6 +24,7 @@ passkey = provider.ADDON.getSetting("passkey")
 icon = xbmcaddon.Addon().getAddonInfo('icon')
 filtre_film = provider.ADDON.getSetting("filtre_f")
 filtre_serie = provider.ADDON.getSetting("filtre_s")
+serie_en_plus = provider.ADDON.getSetting("serie_en_plus")
 
 
 limit = 15 #provider.ADDON.getSetting("limit")
@@ -93,7 +94,7 @@ def call(method='', params=None) :
         raise Exception('Error while sending %s request: HTTP %s' % (method, req.getcode()))
 
 # Default Search
-def search(query, cat_id=CAT_MOVIE, terms=None):
+def search(query, cat_id=CAT_MOVIE, terms=None, episode = False):
     provider.notify(message=str(query).replace('+',' ').title(), header="Quasar AlexP's [COLOR FF18F6F3]t411[/COLOR] Provider" , time=3000, image=icon)
     result = []
     threads = []
@@ -101,6 +102,10 @@ def search(query, cat_id=CAT_MOVIE, terms=None):
     provider.log.debug("QUERY : %s" % query)
     query = query.replace('+','%20')
     response = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, cat_id, terms))
+    if episode and serie_en_plus == 'true':
+        terms2 = terms[:-3] + '936'
+        response2 = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, cat_id, terms2))
+        response['torrents'] = response['torrents'] + response2['torrents']
     provider.log.debug("Search results : %s" % response)
     # quasar send GET requests & t411 api needs POST
     # Must use the bencode tool :(
@@ -186,7 +191,7 @@ def search_episode(episode):
             
         terms += '&term[46][]=%s' % real_ep
     
-    return search(episode['title'], CAT_TV, terms)
+    return search(episode['title'], CAT_TV, terms, episode = True)
     
 def search_season(serie):
     pref_terms = ''
