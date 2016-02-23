@@ -1,5 +1,8 @@
+Version 1.3 :
+- Recherche aussi les torrents de saison complète pour un épisode (option)
+- Nouvel icon, fanart
 
-Version 1.2.1:
+Version 1.2.1 :
 - Fix recherche saison
 
 Version 1.2 :
