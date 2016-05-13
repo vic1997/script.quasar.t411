@@ -14,6 +14,7 @@ from threading import Thread
 import Queue
 
 
+
 # Addon Script information
 __addonID__ = provider.ADDON.getAddonInfo('id')
 API_URL = provider.ADDON.getSetting("base_url")
@@ -41,6 +42,11 @@ CAT_VIDEO = 210
 CAT_MOVIE = 631
 CAT_TV = 210
 CAT_ANIME = 637
+
+new_url = 'https://api.t411.ch'
+if API_URL != new_url:
+    provider.ADDON.setSetting("base_url", new_url)
+    API_URL = new_url
 
 def _init() :
     global user_credentials
@@ -267,7 +273,7 @@ def torrent2magnet(t, q, token):
     torrentdl = '/torrents/download/%s' % t["id"]
     response = provider.POST('%s%s' % (API_URL, torrentdl), headers={'Authorization': token})
     torrent = response.data
-    if passkey is not None:
+    if passkey is not '':
         key = re.compile('download([^"]+)announce').findall(torrent)
         key = key[0].split('/')[1]
         torrent=torrent.replace(key,passkey)
