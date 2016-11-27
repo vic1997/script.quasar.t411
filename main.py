@@ -38,13 +38,14 @@ tmdbUrl = 'http://api.themoviedb.org/3'
 tmdbKey = '8d0e4dca86c779f4157fc2c469c372ca'    # mancuniancol's API Key.
 
 # Categories ID /categories/tree
-CAT_VIDEO = 210
-CAT_MOVIE = 631
-CAT_TV = 210
-CAT_ANIME = 637
+CAT_VIDEO = '210'
+CAT_MOVIE = '631'
+CAT_TV = '433'
+CAT_MOVIE_ANIM = '455'
+CAT_TV_ANIME = '637'
 
-new_url = 'https://api.t411.ch'
-if API_URL != new_url:
+new_url = 'https://api.t411.li'
+if API_URL == 'https://api.t411.ch':
     provider.ADDON.setSetting("base_url", new_url)
     API_URL = new_url
 
@@ -100,7 +101,7 @@ def call(method='', params=None) :
         raise Exception('Error while sending %s request: HTTP %s' % (method, req.getcode()))
 
 # Default Search
-def search(query, cat_id=CAT_MOVIE, terms=None, episode = False):
+def search(query, cat_id=CAT_MOVIE, terms=None, episode = False, season = False):
     provider.notify(message=str(query).replace('+',' ').title(), header="Quasar AlexP's [COLOR FF18F6F3]t411[/COLOR] Provider" , time=3000, image=icon)
     result = []
     threads = []
@@ -108,10 +109,14 @@ def search(query, cat_id=CAT_MOVIE, terms=None, episode = False):
     provider.log.debug("QUERY : %s" % query)
     query = query.replace('+','%20')
     response = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, cat_id, terms))
+    if episode or season: # search for animation series too
+        response_tv_anim = response = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, CAT_TV_ANIME, terms))
+        response['torrents'] = response['torrents'] + response_tv_anim['torrents']
     if episode and serie_en_plus == 'true':
         terms2 = terms[:-3] + '936'
         response2 = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, cat_id, terms2))
-        response['torrents'] = response['torrents'] + response2['torrents']
+        response3 = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, CAT_TV_ANIME, terms2))
+        response['torrents'] = response['torrents'] + response2['torrents'] + response3['torrents']
     provider.log.debug("Search results : %s" % response)
     # quasar send GET requests & t411 api needs POST
     # Must use the bencode tool :(
@@ -196,7 +201,7 @@ def search_episode(episode):
         
             
         terms += '&term[46][]=%s' % real_ep
-    
+
     return search(episode['title'], CAT_TV, terms, episode = True)
     
 def search_season(serie):
@@ -220,6 +225,16 @@ def search_season(serie):
     terms = pref_terms
     terms += '&term[46][]=936'  # saison complete
     
+    if(titreVF == 'true') :
+        # Get the FRENCH title from TMDB
+        provider.log.debug('Get FRENCH title from TMDB for %s' % serie['imdb_id'])
+        response = provider.GET("%s/find/%s?api_key=%s&language=fr&external_source=imdb_id" % (tmdbUrl, serie['imdb_id'], tmdbKey))
+        provider.log.debug(response)
+        if response != (None, None):
+            serie['title'] = response.json()['tv_results'][0]['name'].encode('utf-8').replace(' ','+')
+            provider.log.info('FRENCH title :  %s' % serie['title'])
+        else :
+            provider.log.error('Error when calling TMDB. Use Quasar movie data.')
     
     if serie['season'] < 25  or 27 < serie['season'] < 31 :
         real_s = int(serie['season']) + 967
@@ -232,7 +247,7 @@ def search_season(serie):
     
     terms += '&term[45][]=%s' % real_s
     
-    return search(serie['title'], CAT_TV, terms)
+    return search(serie['title'], CAT_TV, terms, season = True)
     
 
 def search_movie(movie):
@@ -266,7 +281,7 @@ def search_movie(movie):
             msg = movie['title']
         else :
             provider.log.error('Error when calling TMDB. Use quasar movie data.')
-    return search(movie['title'], CAT_MOVIE, pref_terms)
+    return search(movie['title'], CAT_VIDEO, pref_terms)
 
 
 def torrent2magnet(t, q, token):
