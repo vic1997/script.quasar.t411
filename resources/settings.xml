@@ -2,12 +2,12 @@
 <settings>
   <category label="Compte T411">
     <setting label="Compte T411" type="lsep"/>
-    <setting label="URL" type="text" id="base_url" default="https://api.t411.ch"/>
+    <setting label="URL" type="text" id="base_url" default="https://api.t411.li"/>
     <setting label="Login" type="text" id="username" default=""/>
     <setting label="Password" type="text" id="password" default="" option="hidden"/>
     <setting label="Options avancées" type="lsep"/>
-    <setting label="Titre VF" type="bool" id="titreVF" default="false"/>
-    <setting label="Recherche aussi saison complète (épisode)" type="bool" id="serie_en_plus" default="false"/>
+    <setting label="Titre VF" type="bool" id="titreVF" default="true"/>
+    <setting label="Recherche aussi saison complète (épisode)" type="bool" id="serie_en_plus" default="true"/>
 	<setting label="Custom Passkey" type="text" id="passkey" default=""/>
   </category>
   <!--<category label="Filtres">-->
