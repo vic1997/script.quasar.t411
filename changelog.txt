@@ -1,3 +1,8 @@
+Version 1.4.1 :
+- Nouvelle url
+- Ajout des films et séries d'animation
+- Fix recherche de saison avec le titre VF
+
 Version 1.4 :
 - Fix pour le Raspberry Pi
 - Changement d'url t411
