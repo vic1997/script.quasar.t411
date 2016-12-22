@@ -136,7 +136,6 @@ def search(query, cat_id=CAT_MOVIE, terms=None, episode=False, season=False):
     # Must use the bencode tool :(
     
     for t in response['torrents']:
-
         # Call each individual page in parallel
         thread = Thread(target=torrent2magnet, args=(t, q, USER_CREDENTIALS['token']))
         thread.start()
@@ -182,13 +181,10 @@ def search_episode(episode):
         real_s = ''
         if episode['season'] < 25 or 27 < episode['season'] < 31:
             real_s = int(episode['season']) + 967
-            
         if episode['season'] == 25:
             real_s = 994
-            
         if 25 < episode['season'] < 28:
             real_s = int(episode['season']) + 966
-            
         terms += '&term[45][]=%s' % real_s
 
     if episode['episode']:
@@ -199,7 +195,6 @@ def search_episode(episode):
             real_ep = int(episode['episode']) + 937
         if 30 < episode['episode'] < 61:
             real_ep = int(episode['episode']) + 1057
-
         terms += '&term[46][]=%s' % real_ep
 
     return search(episode['title'], CAT_SERIES, terms, episode=True)
@@ -225,6 +220,7 @@ def search_season(series):
             provider.log.error('Error when calling TMDB. Use Quasar movie data.')
 
     real_s = ''
+
     if series['season'] < 25 or 27 < series['season'] < 31:
         real_s = int(series['season']) + 967
         
@@ -290,7 +286,6 @@ def sizeof_fmt(num, suffix=''):
             return "%3.1f%s%s" % (num, unit, suffix)
         num /= 1024.0
     return "%.1f%s%s" % (num, 'Yi', suffix)
-
 
 # Initialize account
 _init()
