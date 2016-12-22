@@ -3,20 +3,28 @@
 Fournit du contenu depuis T411 pour le plugin Quasar sur Kodi.
 ## Infos
 
-Version 1.4.1 - Quasar v0.9.36
+## Original Source
+https://github.com/likeitneverwentaway/script.quasar.t411
+
+Version 1.5 - Quasar v0.9.36
 - Filtres pour la qualité vidéo, séparés pour les films et les séries
 - Filtres pour le language (VO,VF,Multi...), séparés pour les films et les séries
-- Remplacement auto de la clé de compte T411 :bowtie: (possiblement broken [#3]( https://github.com/likeitneverwentaway/script.quasar.t411/issues/3))
 - Recherche de torrents de saison complète
 - Recherche aussi les torrents de saison complète pour un épisode
 - Recherche avec le titre VF
 
 ## Download
 
-:point_right: [Release](https://github.com/likeitneverwentaway/script.quasar.t411/releases/latest)
+:point_right: [Release](https://github.com/paco112/script.quasar.t411/releases/latest)
 
 ## Changelog
-Version 1.4.1 :
+Version 1.5 :
+- Clean code
+- Ajouts de la catégorie "Emission TV"
+- Optimisation des recherches avec titre FR
+- Suppression du remplacement auto de la clé ( respect des règles t411 )
+
+v1.4.1 :
 - Nouvelle url
 - Ajout des films et séries d'animation
 - Fix recherche de saison avec le titre VF 
