@@ -17,7 +17,6 @@ _API_ = provider.ADDON.getSetting("base_url")
 _USERNAME_ = provider.ADDON.getSetting("username")
 _PASSWORD_ = provider.ADDON.getSetting("password")
 _TITLE_VF_ = provider.ADDON.getSetting("title_vf")
-_PASSKEY_ = provider.ADDON.getSetting("passkey")
 _ICON_ = xbmcaddon.Addon().getAddonInfo('icon')
 _FILTER_MOVIE_ = provider.ADDON.getSetting("filter_movie")
 _FILTER_SERIES_ = provider.ADDON.getSetting("filter_series")
@@ -115,22 +114,23 @@ def get_terms(movie=False):
 # Default Search
 def search(query, cat_id=CAT_MOVIE, terms=None, episode=False, season=False):
     provider.notify(message=str(query).replace('+', ' ').title(),
-                    header="Quasar AlexP's [COLOR FF18F6F3]t411[/COLOR] Provider", time=3000, image=_ICON_)
+                    header="Quasar [COLOR FF18F6F3]t411[/COLOR] Provider", time=3000, image=_ICON_)
     result = []
     threads = []
+    search_url = '/torrents/search/%s&?limit=15&cid=%s%s'
     q = Queue.Queue()
     provider.log.debug("QUERY : %s" % query)
     query = query.replace('+', '%20')
-    response = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, cat_id, terms))
+    response = call(search_url % (query, cat_id, terms))
     if episode or season:  # search for animation and emission series too
-        resp_anim = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, CAT_SERIES_ANIMATED, terms))
-        resp_emission = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, CAT_SERIES_EMISSION, terms))
+        resp_anim = call(search_url % (query, CAT_SERIES_ANIMATED, terms))
+        resp_emission = call(search_url % (query, CAT_SERIES_EMISSION, terms))
         response['torrents'] = response['torrents'] + resp_anim['torrents'] + resp_emission['torrents']
     if episode and _FILTER_SERIES_FULL_ == 'true':
         terms2 = terms[:-3] + '936'
-        resp2 = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, cat_id, terms2))
-        resp3 = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, CAT_SERIES_ANIMATED, terms2))
-        resp4 = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, CAT_SERIES_EMISSION, terms2))
+        resp2 = call(search_url % (query, cat_id, terms2))
+        resp3 = call(search_url % (query, CAT_SERIES_ANIMATED, terms2))
+        resp4 = call(search_url % (query, CAT_SERIES_EMISSION, terms2))
         response['torrents'] = response['torrents'] + resp2['torrents'] + resp3['torrents'] + resp4['torrents']
     provider.log.debug("Search results : %s" % response)
     # quasar send GET requests & t411 api needs POST
@@ -263,10 +263,6 @@ def torrent2magnet(t, q, token):
     torrent_url = '/torrents/download/%s' % t["id"]
     response = provider.POST('%s%s' % (_API_, torrent_url), headers={'Authorization': token})
     torrent = response.data
-    if _PASSKEY_ is not '':
-        key = re.compile('download([^"]+)announce').findall(torrent)
-        key = key[0].split('/')[1]
-        torrent = torrent.replace(key, _PASSKEY_)
     metadata = bencode.bdecode(torrent)
     hash_contents = bencode.bencode(metadata['info'])
     digest = hashlib.sha1(hash_contents).hexdigest()
