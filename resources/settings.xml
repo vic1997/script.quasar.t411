@@ -6,14 +6,14 @@
     <setting label="Login" type="text" id="username" default=""/>
     <setting label="Password" type="text" id="password" default="" option="hidden"/>
     <setting label="Options avancées" type="lsep"/>
-    <setting label="Titre VF" type="bool" id="titreVF" default="true"/>
-    <setting label="Recherche aussi saison complète (épisode)" type="bool" id="serie_en_plus" default="true"/>
+    <setting label="Titre VF" type="bool" id="title_vf" default="true"/>
+    <setting label="Recherche aussi saison complète (épisode)" type="bool" id="filter_series_full" default="true"/>
 	<setting label="Custom Passkey" type="text" id="passkey" default=""/>
   </category>
   <!--<category label="Filtres">-->
     <category label="Filtres - Films">
 	  <setting label="Filtrer les résultats pour les films" type="lsep"/>
-	  <setting label="Activer Filtrage" type="bool" id="filtre_f" default="true"/>
+	  <setting label="Activer Filtrage" type="bool" id="filter_movie" default="true"/>
 	  <setting label="Qualité Vidéo" type="lsep"/>
 	  <setting label="Rip depuis Bluray" type="lsep"/>
 	  <setting type="bool" enable="eq(-3,true)" label="Bluray Remux" id="17_f" default="false" />
@@ -48,7 +48,7 @@
 	
 	<category label="Filtres - Séries">
 	  <setting label="Filtrer les résultats pour les séries" type="lsep"/>
-	  <setting label="Activer Filtrage" type="bool" id="filtre_s" default="true"/>
+	  <setting label="Activer Filtrage" type="bool" id="filter_series" default="true"/>
 	  <setting label="Qualité Vidéo" type="lsep"/>
 	  <setting label="Rip depuis Bluray" type="lsep"/>
 	  <setting type="bool" enable="eq(-3,true)" label="Bluray Remux" id="17_s" default="false" />

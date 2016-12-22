@@ -16,19 +16,19 @@ _ID_ = provider.ADDON.getAddonInfo('id')
 _API_ = provider.ADDON.getSetting("base_url")
 _USERNAME_ = provider.ADDON.getSetting("username")
 _PASSWORD_ = provider.ADDON.getSetting("password")
-_TITLE_VF_ = provider.ADDON.getSetting("titreVF")
+_TITLE_VF_ = provider.ADDON.getSetting("title_vf")
 _PASSKEY_ = provider.ADDON.getSetting("passkey")
 _ICON_ = xbmcaddon.Addon().getAddonInfo('icon')
-_FILTER_MOVIE_ = provider.ADDON.getSetting("filtre_f")
-_FILTER_SERIES_ = provider.ADDON.getSetting("filtre_s")
-_FILTER_SERIES_FULL_ = provider.ADDON.getSetting("serie_en_plus")
+_FILTER_MOVIE_ = provider.ADDON.getSetting("filter_movie")
+_FILTER_SERIES_ = provider.ADDON.getSetting("filter_series")
+_FILTER_SERIES_FULL_ = provider.ADDON.getSetting("filter_series_full")
 _FILTER_LIMIT_ = 15
 
 USER_CREDENTIALS = {}
 USER_CREDENTIALS_FILE = xbmc.translatePath("special://profile/addon_data/%s/token.txt" % _ID_)
 
 TMDB_URL = 'http://api.themoviedb.org/3'
-TMDB_KEY = '8d0e4dca86c779f4157fc2c469c372ca'    # mancuniancol's API Key.
+TMDB_KEY = '8d0e4dca86c779f4157fc2c469c372ca'  # mancuniancol's API Key.
 
 # Categories ID /categories/tree
 CAT_VIDEO = '210'
@@ -47,7 +47,7 @@ if _API_ == 'https://api.t411.ch':
 
 def _init():
     global USER_CREDENTIALS
-    provider.log.info("Get user credentials and authentificate it, "
+    provider.log.info("Get user credentials and authenticate it, "
                       "if any credentials defined use token stored in user file")
     try:
         with open(USER_CREDENTIALS_FILE) as user_cred_file:
