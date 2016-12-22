@@ -36,7 +36,7 @@ CAT_MOVIE = '631'
 CAT_MOVIE_ANIM = '455'
 CAT_SERIES = '433'
 CAT_SERIES_ANIMATED = '637'
-CAT_EMISSION = '639'
+CAT_SERIES_EMISSION = '639'
 
 
 if _API_ == 'https://api.t411.ch':
@@ -122,15 +122,16 @@ def search(query, cat_id=CAT_MOVIE, terms=None, episode=False, season=False):
     provider.log.debug("QUERY : %s" % query)
     query = query.replace('+', '%20')
     response = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, cat_id, terms))
-    if episode or season:  # search for animation series too
-        response_tv_anim = response = call('/torrents/search/%s&?limit=15&cid=%s%s' 
-                                           % (query, CAT_SERIES_ANIMATED, terms))
-        response['torrents'] = response['torrents'] + response_tv_anim['torrents']
+    if episode or season:  # search for animation and emission series too
+        resp_anim = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, CAT_SERIES_ANIMATED, terms))
+        resp_emission = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, CAT_SERIES_EMISSION, terms))
+        response['torrents'] = response['torrents'] + resp_anim['torrents'] + resp_emission['torrents']
     if episode and _FILTER_SERIES_FULL_ == 'true':
         terms2 = terms[:-3] + '936'
-        response2 = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, cat_id, terms2))
-        response3 = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, CAT_SERIES_ANIMATED, terms2))
-        response['torrents'] = response['torrents'] + response2['torrents'] + response3['torrents']
+        resp2 = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, cat_id, terms2))
+        resp3 = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, CAT_SERIES_ANIMATED, terms2))
+        resp4 = call('/torrents/search/%s&?limit=15&cid=%s%s' % (query, CAT_SERIES_EMISSION, terms2))
+        response['torrents'] = response['torrents'] + resp2['torrents'] + resp3['torrents'] + resp4['torrents']
     provider.log.debug("Search results : %s" % response)
     # quasar send GET requests & t411 api needs POST
     # Must use the bencode tool :(
