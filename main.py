@@ -275,7 +275,11 @@ def search_movie(movie):
         provider.log.debug('Get FRENCH title from TMDB for %s' % movie['imdb_id'])
         response = provider.GET("%s/movie/%s?api_key=%s&language=fr&external_source=imdb_id&append_to_response=alternative_titles" % (tmdbUrl, movie['imdb_id'], tmdbKey))
         if response != (None, None):
-            movie['title'] = response.json()['title'].encode('utf-8')
+            response = response.json()
+            movie['title'] = response['title'].encode('utf-8')
+            if movie['title'].find(' : ') != -1:
+                movie['title'] = movie['title'].split(' : ')[0] ## SPLIT LONG TITLE
+                movie['title'] = movie['title'] + ' ' + response['release_date'].split('-')[0] ## ADD YEAR
             provider.log.info('FRENCH title :  %s' % movie['title'])
             global msg
             msg = movie['title']
