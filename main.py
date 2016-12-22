@@ -63,7 +63,7 @@ def _init():
 
 def _auth(username, password):
     global USER_CREDENTIALS
-    provider.log.info("Authentificate user and store token")
+    provider.log.info("Authenticate user and store token")
     USER_CREDENTIALS = call('/auth', {'username': username, 'password': password})
     print(USER_CREDENTIALS)
     if 'error' in USER_CREDENTIALS:
@@ -93,11 +93,11 @@ def call(method='', params=None):
 def get_terms(movie=False):
     terms = [[]] * 18
     pref_terms = ''
-    # 7 : Video - Qualite
+    # 7 : Video - Quality
     terms[7] = [8, 10, 11, 12, 15, 16, 17, 18, 19, 1162, 1174, 1175, 1182, 1208, 1218, 1233]
     # 9 : Video - Type
     terms[9] = [22, 23, 24, 1045]
-    # 17 : Video - Langue
+    # 17 : Video - Language
     if not movie:
         get_type = 's'
         terms[17] = [1209, 1210, 1211, 1212, 1213, 1214, 1215, 1216]
@@ -205,38 +205,38 @@ def search_episode(episode):
     return search(episode['title'], CAT_SERIES, terms, episode=True)
 
 
-def search_season(serie):
+def search_season(series):
     terms = ''
     if _FILTER_SERIES_ == 'true':
         terms = get_terms()
 
-    terms += '&term[46][]=936'  # saison complete
+    terms += '&term[46][]=936'  # complete season
     
     if _TITLE_VF_ == 'true':
         # Get the FRENCH title from TMDB
-        provider.log.debug('Get FRENCH title from TMDB for %s' % serie['imdb_id'])
+        provider.log.debug('Get FRENCH title from TMDB for %s' % series['imdb_id'])
         response = provider.GET("%s/find/%s?api_key=%s&language=fr&external_source=imdb_id"
-                                % (TMDB_URL, serie['imdb_id'], TMDB_KEY))
+                                % (TMDB_URL, series['imdb_id'], TMDB_KEY))
         provider.log.debug(response)
         if response != (None, None):
-            serie['title'] = response.json()['tv_results'][0]['name'].encode('utf-8').replace(' ', '+')
-            provider.log.info('FRENCH title :  %s' % serie['title'])
+            series['title'] = response.json()['tv_results'][0]['name'].encode('utf-8').replace(' ', '+')
+            provider.log.info('FRENCH title :  %s' % series['title'])
         else:
             provider.log.error('Error when calling TMDB. Use Quasar movie data.')
 
     real_s = ''
-    if serie['season'] < 25 or 27 < serie['season'] < 31:
-        real_s = int(serie['season']) + 967
+    if series['season'] < 25 or 27 < series['season'] < 31:
+        real_s = int(series['season']) + 967
         
-    if serie['season'] == 25:
+    if series['season'] == 25:
         real_s = 994
         
-    if 25 < serie['season'] < 28:
-        real_s = int(serie['season']) + 966
+    if 25 < series['season'] < 28:
+        real_s = int(series['season']) + 966
     
     terms += '&term[45][]=%s' % real_s
     
-    return search(serie['title'], CAT_SERIES, terms, season=True)
+    return search(series['title'], CAT_SERIES, terms, season=True)
     
 
 def search_movie(movie):
@@ -245,7 +245,6 @@ def search_movie(movie):
         terms = get_terms(False)
                
     if _TITLE_VF_ == 'true':
-        # quasar 0.2 doesn't work well with foreing title. Get the FRENCH title from TMDB
         provider.log.debug('Get FRENCH title from TMDB for %s' % movie['imdb_id'])
         response = provider.GET(
             "%s/movie/%s?api_key=%s&language=fr&external_source=imdb_id&append_to_response=alternative_titles"
@@ -264,20 +263,17 @@ def search_movie(movie):
 
 
 def torrent2magnet(t, q, token):
-    torrentdl = '/torrents/download/%s' % t["id"]
-    response = provider.POST('%s%s' % (_API_, torrentdl), headers={'Authorization': token})
+    torrent_url = '/torrents/download/%s' % t["id"]
+    response = provider.POST('%s%s' % (_API_, torrent_url), headers={'Authorization': token})
     torrent = response.data
     if _PASSKEY_ is not '':
         key = re.compile('download([^"]+)announce').findall(torrent)
         key = key[0].split('/')[1]
         torrent = torrent.replace(key, _PASSKEY_)
     metadata = bencode.bdecode(torrent)
-    hashcontents = bencode.bencode(metadata['info'])
-    digest = hashlib.sha1(hashcontents).hexdigest()
+    hash_contents = bencode.bencode(metadata['info'])
+    digest = hashlib.sha1(hash_contents).hexdigest()
     trackers = [metadata["announce"]]
-    
-    # xbmc.log('Put Magnet in queue : name %s, size %s, seeds %s, peers %s'
-    # % (t["name"], t["size"], t["seeders"], t["leechers"]), xbmc.LOGDEBUG)
     q.put({
         "size": int(t["size"]),
         "seeds": int(t["seeders"]),
