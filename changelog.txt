@@ -1,3 +1,15 @@
+Version 1.5.1 :
+- Ajouts de la langue dans le nom du torrent
+- Résolution des films plus précise
+- Ajouts d'une option pour limiter le nombre de résultat
+- Fix decode string erreur
+
+Version 1.5 :
+- Clean code
+- Ajouts de la catégorie "Emission TV"
+- Optimisation des recherches avec titre FR
+- Suppression du remplacement auto de la clé ( respect des règles t411 )
+
 Version 1.4.1 :
 - Nouvelle url
 - Ajout des films et séries d'animation
