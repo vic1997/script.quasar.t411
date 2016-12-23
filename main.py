@@ -131,7 +131,7 @@ def search(query, cat_id=CAT_VIDEO, terms=None, episode=False, season=False):
     response = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms))
     if episode or season:  # search for animation and emission series too
         resp_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms))
-        resp_emission = call(search_url % (query, CAT_SERIES_EMISSION, terms))
+        resp_emission = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms))
         response['torrents'] = response['torrents'] + resp_anim['torrents'] + resp_emission['torrents']
     if episode and _FILTER_SERIES_FULL_ == 'true':
         terms2 = terms[:-3] + '936'
