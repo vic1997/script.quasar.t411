@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import re
+import unicodedata
 import json
 import xbmc
 import xbmcaddon
@@ -21,7 +21,7 @@ _ICON_ = xbmcaddon.Addon().getAddonInfo('icon')
 _FILTER_MOVIE_ = provider.ADDON.getSetting("filter_movie")
 _FILTER_SERIES_ = provider.ADDON.getSetting("filter_series")
 _FILTER_SERIES_FULL_ = provider.ADDON.getSetting("filter_series_full")
-_FILTER_LIMIT_ = 15
+_FILTER_LIMIT_ = provider.ADDON.getSetting("filter_limit")
 
 USER_CREDENTIALS = {}
 USER_CREDENTIALS_FILE = xbmc.translatePath("special://profile/addon_data/%s/token.txt" % _ID_)
@@ -37,6 +37,13 @@ CAT_SERIES = '433'
 CAT_SERIES_ANIMATED = '637'
 CAT_SERIES_EMISSION = '639'
 
+# Quasar RESOLUTION
+RESOLUTION_UNKNOWN = 0
+RESOLUTION_480P = 1
+RESOLUTION_720P = 2
+RESOLUTION_1080P = 3
+RESOLUTION_1440P = 4
+RESOLUTION_4K2K = 5
 
 if _API_ == 'https://api.t411.ch':
     new_url = 'https://api.t411.li'
@@ -80,7 +87,7 @@ def call(method='', params=None):
     if method != '/auth':
         token = USER_CREDENTIALS['token']
         provider.log.info('token %s' % token)
-        req = provider.POST('%s%s' % (_API_, method), headers={'Authorization': token})
+        req = provider.GET('%s%s' % (_API_, method), headers={'Authorization': token})
     else:
         req = provider.POST('%s%s' % (_API_, method), data=provider.urlencode(params))
     if req.getcode() == 200:
@@ -112,30 +119,27 @@ def get_terms(movie=False):
 
 
 # Default Search
-def search(query, cat_id=CAT_MOVIE, terms=None, episode=False, season=False):
-    provider.notify(message=str(query).replace('+', ' ').title(),
+def search(query, cat_id=CAT_VIDEO, terms=None, episode=False, season=False):
+    provider.notify(message=str(query).title(),
                     header="Quasar [COLOR FF18F6F3]t411[/COLOR] Provider", time=3000, image=_ICON_)
     result = []
     threads = []
-    search_url = '/torrents/search/%s&?limit=15&cid=%s%s'
+    search_url = '/torrents/search/%s&?limit=%s&cid=%s%s'
     q = Queue.Queue()
     provider.log.debug("QUERY : %s" % query)
-    query = query.replace('+', '%20')
-    response = call(search_url % (query, cat_id, terms))
+    query = query.replace(' ', '%20')
+    response = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms))
     if episode or season:  # search for animation and emission series too
-        resp_anim = call(search_url % (query, CAT_SERIES_ANIMATED, terms))
+        resp_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms))
         resp_emission = call(search_url % (query, CAT_SERIES_EMISSION, terms))
         response['torrents'] = response['torrents'] + resp_anim['torrents'] + resp_emission['torrents']
     if episode and _FILTER_SERIES_FULL_ == 'true':
         terms2 = terms[:-3] + '936'
-        resp2 = call(search_url % (query, cat_id, terms2))
-        resp3 = call(search_url % (query, CAT_SERIES_ANIMATED, terms2))
-        resp4 = call(search_url % (query, CAT_SERIES_EMISSION, terms2))
+        resp2 = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms2))
+        resp3 = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms2))
+        resp4 = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms2))
         response['torrents'] = response['torrents'] + resp2['torrents'] + resp3['torrents'] + resp4['torrents']
-    provider.log.debug("Search results : %s" % response)
-    # quasar send GET requests & t411 api needs POST
-    # Must use the bencode tool :(
-    
+
     for t in response['torrents']:
         # Call each individual page in parallel
         thread = Thread(target=torrent2magnet, args=(t, q, USER_CREDENTIALS['token']))
@@ -151,11 +155,12 @@ def search(query, cat_id=CAT_MOVIE, terms=None, episode=False, season=False):
                        "size": sizeof_fmt(item["size"]),
                        "seeds": item["seeds"], 
                        "peers": item["peers"], 
-                       "name": item["name"],
+                       "name": "[COLOR FF18F6F3]%s[/COLOR] %s" % (item["languages"], item["name"]),
                        "trackers": item["trackers"],
                        "info_hash": item["info_hash"],
+                       "resolution": item["resolution"],
                        "is_private": True,
-                       "provider": "[COLOR FF18F6F3]t411[/COLOR]",
+                       "provider": "t411",
                        "icon": _ICON_})
     return result
 
@@ -173,7 +178,8 @@ def search_episode(episode):
                                 % (TMDB_URL, episode['imdb_id'], TMDB_KEY))
         provider.log.debug(response)
         if response != (None, None):
-            episode['title'] = response.json()['tv_results'][0]['name'].encode('utf-8').replace(' ', '+')
+            title = response.json()['tv_results'][0]['name']
+            episode['title'] = unicodedata.normalize('NFKD', title).encode('ascii', 'ignore')
             provider.log.info('FRENCH title :  %s' % episode['title'])
         else:
             provider.log.error('Error when calling TMDB. Use Quasar movie data.')
@@ -215,7 +221,8 @@ def search_season(series):
                                 % (TMDB_URL, series['imdb_id'], TMDB_KEY))
         provider.log.debug(response)
         if response != (None, None):
-            series['title'] = response.json()['tv_results'][0]['name'].encode('utf-8').replace(' ', '+')
+            title = response.json()['tv_results'][0]['name']
+            series['title'] = unicodedata.normalize('NFKD', title).encode('ascii', 'ignore')
             provider.log.info('FRENCH title :  %s' % series['title'])
         else:
             provider.log.error('Error when calling TMDB. Use Quasar movie data.')
@@ -234,7 +241,7 @@ def search_season(series):
     terms += '&term[45][]=%s' % real_s
     
     return search(series['title'], CAT_SERIES, terms, season=True)
-    
+
 
 def search_movie(movie):
     terms = ''
@@ -249,20 +256,23 @@ def search_movie(movie):
         )
         if response != (None, None):
             response = response.json()
-            movie['title'] = response['title'].encode('utf-8')
+            movie['title'] = unicodedata.normalize('NFKD', response['title']).encode('ascii', 'ignore')
             if movie['title'].find(' : ') != -1:
                 movie['title'] = movie['title'].split(' : ')[0]  # SPLIT LONG TITLE
                 movie['title'] = movie['title'] + ' ' + response['release_date'].split('-')[0]  # ADD YEAR
             provider.log.info('FRENCH title :  %s' % movie['title'])
         else:
             provider.log.error('Error when calling TMDB. Use quasar movie data.')
-    return search(movie['title'], CAT_VIDEO, terms)
+    return search(movie['title'], CAT_MOVIE, terms)
 
 
 def torrent2magnet(t, q, token):
     torrent_url = '/torrents/download/%s' % t["id"]
-    response = provider.POST('%s%s' % (_API_, torrent_url), headers={'Authorization': token})
-    torrent = response.data
+    details_url = '/torrents/details/%s' % t["id"]
+    resp_details = provider.GET('%s%s' % (_API_, details_url), headers={'Authorization': token})
+    resp_torrent = provider.GET('%s%s' % (_API_, torrent_url), headers={'Authorization': token})
+    torrent = resp_torrent.data
+    torrent_details = resp_details.json()
     metadata = bencode.bdecode(torrent)
     hash_contents = bencode.bencode(metadata['info'])
     digest = hashlib.sha1(hash_contents).hexdigest()
@@ -271,10 +281,22 @@ def torrent2magnet(t, q, token):
         "size": int(t["size"]),
         "seeds": int(t["seeders"]),
         "peers": int(t["leechers"]),
-        "name": t["name"].encode('utf-8'),
+        "name": t["name"].encode('utf-8', 'ignore'),
         "trackers": trackers,
-        "info_hash": digest
+        "info_hash": digest,
+        "resolution": get_resolution(torrent_details['terms'][u'Vid\xe9o - Qualit\xe9'].encode('utf-8', 'ignore')),
+        "languages": torrent_details['terms'][u'Vid\xe9o - Langue'].encode('utf-8', 'ignore')
     })
+
+
+def get_resolution(txt):
+    if txt.find('4k') != -1:
+        return RESOLUTION_4K2K
+    if txt.find('1080') != -1:
+        return RESOLUTION_1080P
+    if txt.find('720') != -1:
+        return RESOLUTION_720P
+    return RESOLUTION_UNKNOWN
 
 
 def sizeof_fmt(num, suffix=''):
