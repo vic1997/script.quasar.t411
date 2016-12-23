@@ -1,82 +1,79 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-  <category label="Compte T411">
-    <setting label="Compte T411" type="lsep"/>
-    <setting label="URL" type="text" id="base_url" default="https://api.t411.li"/>
-    <setting label="Login" type="text" id="username" default=""/>
-    <setting label="Password" type="text" id="password" default="" option="hidden"/>
-    <setting label="Options avancées" type="lsep"/>
-    <setting label="Titre VF" type="bool" id="title_vf" default="true"/>
-    <setting label="Recherche aussi saison complète (épisode)" type="bool" id="filter_series_full" default="true"/>
-  </category>
-  <!--<category label="Filtres">-->
+    <category label="Compte T411">
+        <setting label="Compte T411" type="lsep"/>
+        <setting label="URL" type="text" id="base_url" default="https://api.t411.li"/>
+        <setting label="Login" type="text" id="username" default=""/>
+        <setting label="Password" type="text" id="password" default="" option="hidden"/>
+        <setting label="Options avancées" type="lsep"/>
+        <setting label="Titre VF" type="bool" id="title_vf" default="true"/>
+        <setting label="Recherche aussi saison complète (épisode)" type="bool" id="filter_series_full" default="true"/>
+        <setting label="Nombre maximum de résultat" type="number" id="filter_limit" default="10"/>
+    </category>
     <category label="Filtres - Films">
-	  <setting label="Filtrer les résultats pour les films" type="lsep"/>
-	  <setting label="Activer Filtrage" type="bool" id="filter_movie" default="true"/>
-	  <setting label="Qualité Vidéo" type="lsep"/>
-	  <setting label="Rip depuis Bluray" type="lsep"/>
-	  <setting type="bool" enable="eq(-3,true)" label="Bluray Remux" id="17_f" default="false" />
-	  <setting type="bool" enable="eq(-4,true)" label="1080 HDrip - Rip HD depuis Bluray" id="16_f" default="true" />
-	  <setting type="bool" enable="eq(-5,true)" label="720 HDrip - Rip HD depuis Bluray" id="15_f" default="true" />
-	  <setting type="bool" enable="eq(-6,true)" label="1080 HDlight - Rip HD-léger depuis source HD" id="1208_f" default="true" />
-	  <setting type="bool" enable="eq(-7,true)" label="720 HDlight - Rip HD-léger depuis source HD" id="1218_f" default="true" />
-	  <setting type="bool" enable="eq(-8,true)" label="480 BDrip/BRrip - Rip SD depuis Bluray ou HDrip" id="8_f" default="false" />
-	  <setting label="TVRip (HDTV,FASTSUB,PROPER...)" type="lsep"/>
-	  <setting type="bool" enable="eq(-10,true)" label="TVripHD 1080p" id="1162_f" default="false" />
-	  <setting type="bool" enable="eq(-11,true)" label="TVripHD 720p" id="12_f" default="false" />
-	  <setting type="bool" enable="eq(-12,true)" label="TVrip 480p" id="11_f" default="false" />
-	  <setting label="Autres Rip" type="lsep"/>
-	  <setting type="bool" enable="eq(-14,true)" label="WEBrip" id="19_f" default="true" />
-	  <setting type="bool" enable="eq(-15,true)" label="DVDrip" id="10_f" default="true" />
-	  <setting type="bool" enable="eq(-16,true)" label="VCD/SVCD/VHSrip" id="18_f" default="false" />
-	  <setting label="WebDL" type="lsep"/>
-	  <setting type="bool" enable="eq(-18,true)" label="Web-Dl 4K" id="1182_f" default="true" />
-	  <setting type="bool" enable="eq(-19,true)" label="Web-Dl 1080" id="1174_f" default="true" />
-	  <setting type="bool" enable="eq(-20,true)" label="Web-Dl 720" id="1175_f" default="true" />
-	  <setting type="bool" enable="eq(-21,true)" label="Web-Dl 480" id="1233_f" default="false" />
-	  <setting label="Langue" type="lsep"/>
-	  <setting type="bool" enable="eq(-23,true)" label="Anglais" id="540_f" default="true" />
-	  <setting type="bool" enable="eq(-24,true)" label="Français (VFF/Truefrench)" id="541_f" default="true" />
-	  <setting type="bool" enable="eq(-25,true)" label="Multi (Français inclus)" id="542_f" default="true" />
-	  <setting type="bool" enable="eq(-26,true)" label="Multi (Québécois inclus)" id="1160_f" default="true" />
-	  <setting type="bool" enable="eq(-27,true)" label="Québécois (VFQ/French)" id="719_f" default="true" />
-	  <setting type="bool" enable="eq(-28,true)" label="VFSTFR" id="720_f" default="true" />
-	  <setting type="bool" enable="eq(-29,true)" label="VOSTFR" id="721_f" default="true" />
-	  
-	</category>
-	
-	<category label="Filtres - Séries">
-	  <setting label="Filtrer les résultats pour les séries" type="lsep"/>
-	  <setting label="Activer Filtrage" type="bool" id="filter_series" default="true"/>
-	  <setting label="Qualité Vidéo" type="lsep"/>
-	  <setting label="Rip depuis Bluray" type="lsep"/>
-	  <setting type="bool" enable="eq(-3,true)" label="Bluray Remux" id="17_s" default="false" />
-	  <setting type="bool" enable="eq(-4,true)" label="1080 HDrip - Rip HD depuis Bluray" id="16_s" default="true" />
-	  <setting type="bool" enable="eq(-5,true)" label="720 HDrip - Rip HD depuis Bluray" id="15_s" default="true" />
-	  <setting type="bool" enable="eq(-6,true)" label="1080 HDlight - Rip HD-léger depuis source HD" id="1208_s" default="true" />
-	  <setting type="bool" enable="eq(-7,true)" label="720 HDlight - Rip HD-léger depuis source HD" id="1218_s" default="true" />
-	  <setting type="bool" enable="eq(-8,true)" label="480 BDrip/BRrip - Rip SD depuis Bluray ou HDrip" id="8_s" default="false" />
-	  <setting label="TVRip (HDTV,FASTSUB,PROPER...)" type="lsep"/>
-	  <setting type="bool" enable="eq(-10,true)" label="TVripHD 1080p" id="1162_s" default="true" />
-	  <setting type="bool" enable="eq(-11,true)" label="TVripHD 720p" id="12_s" default="true" />
-	  <setting type="bool" enable="eq(-12,true)" label="TVrip 480p" id="11_s" default="false" />
-	  <setting label="Autres Rip" type="lsep"/>
-	  <setting type="bool" enable="eq(-14,true)" label="WEBrip" id="19_s" default="true" />
-	  <setting type="bool" enable="eq(-15,true)" label="DVDrip" id="10_s" default="true" />
-	  <setting type="bool" enable="eq(-16,true)" label="VCD/SVCD/VHSrip" id="18_s" default="false" />
-	  <setting label="WebDL" type="lsep"/>
-	  <setting type="bool" enable="eq(-18,true)" label="Web-Dl 4K" id="1182_s" default="true" />
-	  <setting type="bool" enable="eq(-19,true)" label="Web-Dl 1080" id="1174_s" default="true" />
-	  <setting type="bool" enable="eq(-20,true)" label="Web-Dl 720" id="1175_s" default="true" />
-	  <setting type="bool" enable="eq(-21,true)" label="Web-Dl 480" id="1233_s" default="false" />
-	  <setting label="Langue" type="lsep"/>
-	  <setting type="bool" enable="eq(-23,true)" label="Anglais" id="540_s" default="true" />
-	  <setting type="bool" enable="eq(-24,true)" label="Français (VFF/Truefrench)" id="541_s" default="true" />
-	  <setting type="bool" enable="eq(-25,true)" label="Multi (Français inclus)" id="542_s" default="true" />
-	  <setting type="bool" enable="eq(-26,true)" label="Multi (Québécois inclus)" id="1160_s" default="true" />
-	  <setting type="bool" enable="eq(-27,true)" label="Québécois (VFQ/French)" id="719_s" default="true" />
-	  <setting type="bool" enable="eq(-28,true)" label="VFSTFR" id="720_s" default="true" />
-	  <setting type="bool" enable="eq(-29,true)" label="VOSTFR" id="721_s" default="true" />
-	</category>
-  <!--</category>-->
+        <setting label="Filtrer les résultats pour les films" type="lsep"/>
+        <setting label="Activer Filtrage" type="bool" id="filter_movie" default="true"/>
+        <setting label="Qualité Vidéo" type="lsep"/>
+        <setting label="Rip depuis Bluray" type="lsep"/>
+        <setting type="bool" enable="eq(-3,true)" label="Bluray Remux" id="17_f" default="false" />
+        <setting type="bool" enable="eq(-4,true)" label="1080 HDrip - Rip HD depuis Bluray" id="16_f" default="true" />
+        <setting type="bool" enable="eq(-5,true)" label="720 HDrip - Rip HD depuis Bluray" id="15_f" default="true" />
+        <setting type="bool" enable="eq(-6,true)" label="1080 HDlight - Rip HD-léger depuis source HD" id="1208_f" default="true" />
+        <setting type="bool" enable="eq(-7,true)" label="720 HDlight - Rip HD-léger depuis source HD" id="1218_f" default="true" />
+        <setting type="bool" enable="eq(-8,true)" label="480 BDrip/BRrip - Rip SD depuis Bluray ou HDrip" id="8_f" default="true" />
+        <setting label="TVRip (HDTV,FASTSUB,PROPER...)" type="lsep"/>
+        <setting type="bool" enable="eq(-10,true)" label="TVripHD 1080p" id="1162_f" default="true" />
+        <setting type="bool" enable="eq(-11,true)" label="TVripHD 720p" id="12_f" default="true" />
+        <setting type="bool" enable="eq(-12,true)" label="TVrip 480p" id="11_f" default="true" />
+        <setting label="Autres Rip" type="lsep"/>
+        <setting type="bool" enable="eq(-14,true)" label="WEBrip" id="19_f" default="true" />
+        <setting type="bool" enable="eq(-15,true)" label="DVDrip" id="10_f" default="true" />
+        <setting type="bool" enable="eq(-16,true)" label="VCD/SVCD/VHSrip" id="18_f" default="true" />
+        <setting label="WebDL" type="lsep"/>
+        <setting type="bool" enable="eq(-18,true)" label="Web-Dl 4K" id="1182_f" default="true" />
+        <setting type="bool" enable="eq(-19,true)" label="Web-Dl 1080" id="1174_f" default="true" />
+        <setting type="bool" enable="eq(-20,true)" label="Web-Dl 720" id="1175_f" default="true" />
+        <setting type="bool" enable="eq(-21,true)" label="Web-Dl 480" id="1233_f" default="true" />
+        <setting label="Langue" type="lsep"/>
+        <setting type="bool" enable="eq(-23,true)" label="Anglais" id="540_f" default="true" />
+        <setting type="bool" enable="eq(-24,true)" label="Français (VFF/Truefrench)" id="541_f" default="true" />
+        <setting type="bool" enable="eq(-25,true)" label="Multi (Français inclus)" id="542_f" default="true" />
+        <setting type="bool" enable="eq(-26,true)" label="Multi (Québécois inclus)" id="1160_f" default="true" />
+        <setting type="bool" enable="eq(-27,true)" label="Québécois (VFQ/French)" id="719_f" default="true" />
+        <setting type="bool" enable="eq(-28,true)" label="VFSTFR" id="720_f" default="true" />
+        <setting type="bool" enable="eq(-29,true)" label="VOSTFR" id="721_f" default="true" />
+    </category>
+    <category label="Filtres - Séries">
+        <setting label="Filtrer les résultats pour les séries" type="lsep"/>
+        <setting label="Activer Filtrage" type="bool" id="filter_series" default="true"/>
+        <setting label="Qualité Vidéo" type="lsep"/>
+        <setting label="Rip depuis Bluray" type="lsep"/>
+        <setting type="bool" enable="eq(-3,true)" label="Bluray Remux" id="17_s" default="false" />
+        <setting type="bool" enable="eq(-4,true)" label="1080 HDrip - Rip HD depuis Bluray" id="16_s" default="true" />
+        <setting type="bool" enable="eq(-5,true)" label="720 HDrip - Rip HD depuis Bluray" id="15_s" default="true" />
+        <setting type="bool" enable="eq(-6,true)" label="1080 HDlight - Rip HD-léger depuis source HD" id="1208_s" default="true" />
+        <setting type="bool" enable="eq(-7,true)" label="720 HDlight - Rip HD-léger depuis source HD" id="1218_s" default="true" />
+        <setting type="bool" enable="eq(-8,true)" label="480 BDrip/BRrip - Rip SD depuis Bluray ou HDrip" id="8_s" default="false" />
+        <setting label="TVRip (HDTV,FASTSUB,PROPER...)" type="lsep"/>
+        <setting type="bool" enable="eq(-10,true)" label="TVripHD 1080p" id="1162_s" default="true" />
+        <setting type="bool" enable="eq(-11,true)" label="TVripHD 720p" id="12_s" default="true" />
+        <setting type="bool" enable="eq(-12,true)" label="TVrip 480p" id="11_s" default="false" />
+        <setting label="Autres Rip" type="lsep"/>
+        <setting type="bool" enable="eq(-14,true)" label="WEBrip" id="19_s" default="true" />
+        <setting type="bool" enable="eq(-15,true)" label="DVDrip" id="10_s" default="true" />
+        <setting type="bool" enable="eq(-16,true)" label="VCD/SVCD/VHSrip" id="18_s" default="false" />
+        <setting label="WebDL" type="lsep"/>
+        <setting type="bool" enable="eq(-18,true)" label="Web-Dl 4K" id="1182_s" default="true" />
+        <setting type="bool" enable="eq(-19,true)" label="Web-Dl 1080" id="1174_s" default="true" />
+        <setting type="bool" enable="eq(-20,true)" label="Web-Dl 720" id="1175_s" default="true" />
+        <setting type="bool" enable="eq(-21,true)" label="Web-Dl 480" id="1233_s" default="false" />
+        <setting label="Langue" type="lsep"/>
+        <setting type="bool" enable="eq(-23,true)" label="Anglais" id="540_s" default="true" />
+        <setting type="bool" enable="eq(-24,true)" label="Français (VFF/Truefrench)" id="541_s" default="true" />
+        <setting type="bool" enable="eq(-25,true)" label="Multi (Français inclus)" id="542_s" default="true" />
+        <setting type="bool" enable="eq(-26,true)" label="Multi (Québécois inclus)" id="1160_s" default="true" />
+        <setting type="bool" enable="eq(-27,true)" label="Québécois (VFQ/French)" id="719_s" default="true" />
+        <setting type="bool" enable="eq(-28,true)" label="VFSTFR" id="720_s" default="true" />
+        <setting type="bool" enable="eq(-29,true)" label="VOSTFR" id="721_s" default="true" />
+    </category>
 </settings>
