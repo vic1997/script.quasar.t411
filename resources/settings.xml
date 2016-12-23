@@ -53,20 +53,20 @@
         <setting type="bool" enable="eq(-5,true)" label="720 HDrip - Rip HD depuis Bluray" id="15_s" default="true" />
         <setting type="bool" enable="eq(-6,true)" label="1080 HDlight - Rip HD-léger depuis source HD" id="1208_s" default="true" />
         <setting type="bool" enable="eq(-7,true)" label="720 HDlight - Rip HD-léger depuis source HD" id="1218_s" default="true" />
-        <setting type="bool" enable="eq(-8,true)" label="480 BDrip/BRrip - Rip SD depuis Bluray ou HDrip" id="8_s" default="false" />
+        <setting type="bool" enable="eq(-8,true)" label="480 BDrip/BRrip - Rip SD depuis Bluray ou HDrip" id="8_s" default="true" />
         <setting label="TVRip (HDTV,FASTSUB,PROPER...)" type="lsep"/>
         <setting type="bool" enable="eq(-10,true)" label="TVripHD 1080p" id="1162_s" default="true" />
         <setting type="bool" enable="eq(-11,true)" label="TVripHD 720p" id="12_s" default="true" />
-        <setting type="bool" enable="eq(-12,true)" label="TVrip 480p" id="11_s" default="false" />
+        <setting type="bool" enable="eq(-12,true)" label="TVrip 480p" id="11_s" default="true" />
         <setting label="Autres Rip" type="lsep"/>
         <setting type="bool" enable="eq(-14,true)" label="WEBrip" id="19_s" default="true" />
         <setting type="bool" enable="eq(-15,true)" label="DVDrip" id="10_s" default="true" />
-        <setting type="bool" enable="eq(-16,true)" label="VCD/SVCD/VHSrip" id="18_s" default="false" />
+        <setting type="bool" enable="eq(-16,true)" label="VCD/SVCD/VHSrip" id="18_s" default="true" />
         <setting label="WebDL" type="lsep"/>
         <setting type="bool" enable="eq(-18,true)" label="Web-Dl 4K" id="1182_s" default="true" />
         <setting type="bool" enable="eq(-19,true)" label="Web-Dl 1080" id="1174_s" default="true" />
         <setting type="bool" enable="eq(-20,true)" label="Web-Dl 720" id="1175_s" default="true" />
-        <setting type="bool" enable="eq(-21,true)" label="Web-Dl 480" id="1233_s" default="false" />
+        <setting type="bool" enable="eq(-21,true)" label="Web-Dl 480" id="1233_s" default="true" />
         <setting label="Langue" type="lsep"/>
         <setting type="bool" enable="eq(-23,true)" label="Anglais" id="540_s" default="true" />
         <setting type="bool" enable="eq(-24,true)" label="Français (VFF/Truefrench)" id="541_s" default="true" />
