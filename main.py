@@ -1,6 +1,8 @@
 # coding: utf-8
 
 import unicodedata
+import base64
+import urllib
 import json
 import xbmc
 import xbmcaddon
@@ -25,6 +27,7 @@ _FILTER_LIMIT_ = provider.ADDON.getSetting("filter_limit")
 
 USER_CREDENTIALS = {}
 USER_CREDENTIALS_FILE = xbmc.translatePath("special://profile/addon_data/%s/token.txt" % _ID_)
+USER_CREDENTIALS_RETRY = 1
 
 TMDB_URL = 'http://api.themoviedb.org/3'
 TMDB_KEY = '8d0e4dca86c779f4157fc2c469c372ca'  # mancuniancol's API Key.
@@ -71,7 +74,6 @@ def _auth(username, password):
     global USER_CREDENTIALS
     provider.log.info("Authenticate user and store token")
     USER_CREDENTIALS = call('/auth', {'username': username, 'password': password})
-    print(USER_CREDENTIALS)
     if 'error' in USER_CREDENTIALS:
         raise Exception('Error while fetching authentication token: %s' % USER_CREDENTIALS['error'])
     # Create or update user file
@@ -83,6 +85,7 @@ def _auth(username, password):
 
 
 def call(method='', params=None):
+    global USER_CREDENTIALS_RETRY
     provider.log.info("Call T411 API: %s%s" % (_API_, method))
     if method != '/auth':
         token = USER_CREDENTIALS['token']
@@ -91,7 +94,17 @@ def call(method='', params=None):
     else:
         req = provider.POST('%s%s' % (_API_, method), data=provider.urlencode(params))
     if req.getcode() == 200:
-        return req.json()
+        resp = req.json()
+        provider.log.info('Resp T411 API %s' % resp)
+        if 'error' in resp:
+            provider.notify(message=resp['error'].encode('utf-8', 'ignore'),
+                            header="Quasar [COLOR FF18F6F3]t411[/COLOR] Provider", time=3000, image=_ICON_)
+            if resp['code'] == 202 and method != '/auth' and USER_CREDENTIALS_RETRY > 0:
+                # Force re auth
+                USER_CREDENTIALS_RETRY -= 1
+                if _auth(_USERNAME_, _PASSWORD_):
+                    return call(method, params)
+        return resp
     else:
         raise Exception('Error while sending %s request: HTTP %s' % (method, req.getcode()))
 
@@ -124,21 +137,26 @@ def search(query, cat_id=CAT_VIDEO, terms=None, episode=False, season=False):
                     header="Quasar [COLOR FF18F6F3]t411[/COLOR] Provider", time=3000, image=_ICON_)
     result = []
     threads = []
-    search_url = '/torrents/search/%s&?limit=%s&cid=%s%s'
+    search_url = '/torrents/search/%s?limit=%s&cid=%s%s'
     q = Queue.Queue()
     provider.log.debug("QUERY : %s" % query)
     query = query.replace(' ', '%20')
     response = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms))
-    if episode or season:  # search for animation and emission series too
-        resp_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms))
-        resp_emission = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms))
-        response['torrents'] = response['torrents'] + resp_anim['torrents'] + resp_emission['torrents']
-    if episode and _FILTER_SERIES_FULL_ == 'true':
-        terms2 = terms[:-3] + '936'
-        resp2 = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms2))
-        resp3 = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms2))
-        resp4 = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms2))
-        response['torrents'] = response['torrents'] + resp2['torrents'] + resp3['torrents'] + resp4['torrents']
+    if not episode and not season:
+        # add animated movie
+        resp_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_MOVIE_ANIM, terms))
+        response['torrents'] = response['torrents'] + resp_anim['torrents']
+    else:
+        if episode or season:  # search for animation and emission series too
+            resp_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms))
+            resp_emission = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms))
+            response['torrents'] = response['torrents'] + resp_anim['torrents'] + resp_emission['torrents']
+        if episode and _FILTER_SERIES_FULL_ == 'true':
+            terms2 = terms[:-3] + '936'
+            resp2 = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms2))
+            resp3 = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms2))
+            resp4 = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms2))
+            response['torrents'] = response['torrents'] + resp2['torrents'] + resp3['torrents'] + resp4['torrents']
 
     for t in response['torrents']:
         # Call each individual page in parallel
@@ -152,16 +170,17 @@ def search(query, cat_id=CAT_VIDEO, terms=None, episode=False, season=False):
     while not q.empty():
         item = q.get()
         result.append({
-                       "size": sizeof_fmt(item["size"]),
-                       "seeds": item["seeds"], 
-                       "peers": item["peers"], 
-                       "name": "[COLOR FF18F6F3]%s[/COLOR] %s" % (item["languages"], item["name"]),
-                       "trackers": item["trackers"],
-                       "info_hash": item["info_hash"],
-                       "resolution": item["resolution"],
-                       "is_private": True,
-                       "provider": "t411",
-                       "icon": _ICON_})
+            "uri": item["uri"],
+            "size": sizeof_fmt(item["size"]),
+            "seeds": item["seeds"],
+            "peers": item["peers"],
+            "name": "[COLOR FF18F6F3]%s[/COLOR] %s" % (item["languages"], item["name"]),
+            "trackers": item["trackers"],
+            "info_hash": item["info_hash"],
+            "resolution": item["resolution"],
+            "is_private": True,
+            "provider": "t411",
+            "icon": _ICON_})
     return result
 
     
@@ -275,9 +294,16 @@ def torrent2magnet(t, q, token):
     torrent_details = resp_details.json()
     metadata = bencode.bdecode(torrent)
     hash_contents = bencode.bencode(metadata['info'])
-    digest = hashlib.sha1(hash_contents).hexdigest()
+    hashsha1 = hashlib.sha1(hash_contents)
+    digest = hashsha1.hexdigest()
+    b32hash = base64.b32encode(hashsha1.digest())
     trackers = [metadata["announce"]]
+    params = {'xt': 'urn:btih:%s' % b32hash,
+              'dn': urllib.quote_plus(metadata['info']['name']),
+              'tr': urllib.quote_plus(metadata['announce']),
+              'xl': metadata['info']['piece length']}
     q.put({
+        "uri": "magnet:?xt=%s&dn=%s&tr=%s&xl=%s" % (params['xt'], params['dn'], params['tr'], params['xl']),
         "size": int(t["size"]),
         "seeds": int(t["seeders"]),
         "peers": int(t["leechers"]),
@@ -292,6 +318,8 @@ def torrent2magnet(t, q, token):
 def get_resolution(txt):
     if txt.find('4k') != -1:
         return RESOLUTION_4K2K
+    if txt.find('1440') != -1:
+        return RESOLUTION_1440P
     if txt.find('1080') != -1:
         return RESOLUTION_1080P
     if txt.find('720') != -1:
