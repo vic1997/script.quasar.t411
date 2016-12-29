@@ -302,6 +302,15 @@ def torrent2magnet(t, q, token):
               'dn': urllib.quote_plus(metadata['info']['name']),
               'tr': urllib.quote_plus(metadata['announce']),
               'xl': metadata['info']['piece length']}
+
+    resolution = RESOLUTION_UNKNOWN
+    if u'Vid\xe9o - Qualit\xe9' in torrent_details['terms']:
+        resolution = get_resolution(torrent_details['terms'][u'Vid\xe9o - Qualit\xe9'].encode('utf-8', 'ignore'))
+
+    languages = ""
+    if u'Vid\xe9o - Langue' in torrent_details['terms']:
+        languages = torrent_details['terms'][u'Vid\xe9o - Langue'].encode('utf-8', 'ignore')
+
     q.put({
         "uri": "magnet:?xt=%s&dn=%s&tr=%s&xl=%s" % (params['xt'], params['dn'], params['tr'], params['xl']),
         "size": int(t["size"]),
@@ -310,8 +319,8 @@ def torrent2magnet(t, q, token):
         "name": t["name"].encode('utf-8', 'ignore'),
         "trackers": trackers,
         "info_hash": digest,
-        "resolution": get_resolution(torrent_details['terms'][u'Vid\xe9o - Qualit\xe9'].encode('utf-8', 'ignore')),
-        "languages": torrent_details['terms'][u'Vid\xe9o - Langue'].encode('utf-8', 'ignore')
+        "resolution": resolution,
+        "languages": languages
     })
 
 
