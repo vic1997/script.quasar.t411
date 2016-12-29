@@ -21,6 +21,7 @@ Version 1.5.2 :
 - Fix compatibilité Quasar > 0.9.45
 - Fix movie animation recherche
 - Fix addons require
+- Fix key errors ( languages & resolutuion )
 
 v1.5.1:
 - Ajouts de la langue dans le nom du torrent
