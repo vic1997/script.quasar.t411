@@ -8,6 +8,10 @@
 # for the specific language governing rights and limitations under the
 # License.
 
+# Written by Petru Paler
+
+from BTL import BTFailure
+
 
 def decode_int(x, f):
     f += 1
@@ -61,9 +65,9 @@ def bdecode(x):
     try:
         r, l = decode_func[x[0]](x, 0)
     except (IndexError, KeyError, ValueError):
-        raise ValueError("not a valid bencoded string")
+        raise BTFailure("not a valid bencoded string")
     if l != len(x):
-        raise ValueError("invalid bencoded value (data after valid prefix)")
+        raise BTFailure("invalid bencoded value (data after valid prefix)")
     return r
 
 from types import StringType, IntType, LongType, DictType, ListType, TupleType
