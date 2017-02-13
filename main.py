@@ -296,12 +296,11 @@ def torrent2magnet(t, q, token):
     hash_contents = bencode.bencode(metadata['info'])
     hashsha1 = hashlib.sha1(hash_contents)
     digest = hashsha1.hexdigest()
-    b32hash = base64.b32encode(hashsha1.digest())
+    # b32hash = base64.b32encode(hashsha1.digest())
     trackers = [metadata["announce"]]
-    params = {'xt': 'urn:btih:%s' % b32hash,
+    params = {'xt': 'urn:btih:%s' % digest,
               'dn': urllib.quote_plus(metadata['info']['name']),
-              'tr': urllib.quote_plus(metadata['announce']),
-              'xl': metadata['info']['piece length']}
+              'tr': urllib.quote_plus(metadata['announce'])}
 
     resolution = RESOLUTION_UNKNOWN
     if u'Vid\xe9o - Qualit\xe9' in torrent_details['terms']:
@@ -312,7 +311,7 @@ def torrent2magnet(t, q, token):
         languages = torrent_details['terms'][u'Vid\xe9o - Langue'].encode('utf-8', 'ignore')
 
     q.put({
-        "uri": "magnet:?xt=%s&dn=%s&tr=%s&xl=%s" % (params['xt'], params['dn'], params['tr'], params['xl']),
+        "uri": "magnet:?xt=%s&dn=%s&tr=%s" % (params['xt'], params['dn'], params['tr']),
         "size": int(t["size"]),
         "seeds": int(t["seeders"]),
         "peers": int(t["leechers"]),

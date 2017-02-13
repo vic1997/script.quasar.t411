@@ -5,7 +5,7 @@ Fournit du contenu depuis T411 pour le plugin Quasar sur Kodi.
 ## Original Source
 https://github.com/likeitneverwentaway/script.quasar.t411
 
-Version 1.5.2 - Quasar v0.9.42
+Version 1.5.3 - Quasar v0.9.42
 - Filtres pour la qualité vidéo, séparés pour les films et les séries
 - Filtres pour le language (VO,VF,Multi...), séparés pour les films et les séries
 - Recherche de torrents de saison complète
@@ -17,6 +17,9 @@ Version 1.5.2 - Quasar v0.9.42
 :point_right: [Release](https://github.com/paco112/script.quasar.t411/releases/latest)
 
 ## Changelog
+Version 1.5.3 :
+- Improve magnet info
+
 Version 1.5.2 :
 - Fix compatibilité Quasar > 0.9.45
 - Fix movie animation recherche

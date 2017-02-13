@@ -1,3 +1,6 @@
+Version 1.5.3 :
+- Improve magnet info
+
 Version 1.5.2 :
 - Fix compatibilité Quasar > 0.9.45
 - Fix movie animation recherche
