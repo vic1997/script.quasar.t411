@@ -1,7 +1,6 @@
 # coding: utf-8
 
 import unicodedata
-import base64
 import urllib
 import json
 import xbmc
@@ -24,6 +23,7 @@ _FILTER_MOVIE_ = provider.ADDON.getSetting("filter_movie")
 _FILTER_SERIES_ = provider.ADDON.getSetting("filter_series")
 _FILTER_SERIES_FULL_ = provider.ADDON.getSetting("filter_series_full")
 _FILTER_LIMIT_ = provider.ADDON.getSetting("filter_limit")
+_TORRENT_DETAILS_ = provider.ADDON.getSetting("torrent_details")
 
 USER_CREDENTIALS = {}
 USER_CREDENTIALS_FILE = xbmc.translatePath("special://profile/addon_data/%s/token.txt" % _ID_)
@@ -117,7 +117,7 @@ def get_terms(movie=False):
     # 9 : Video - Type
     terms[9] = [22, 23, 24, 1045]
     # 17 : Video - Language
-    if not movie:
+    if movie is False:
         get_type = 's'
         terms[17] = [1209, 1210, 1211, 1212, 1213, 1214, 1215, 1216]
     else:
@@ -142,21 +142,22 @@ def search(query, cat_id=CAT_VIDEO, terms=None, episode=False, season=False):
     provider.log.debug("QUERY : %s" % query)
     query = query.replace(' ', '%20')
     response = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms))
-    if not episode and not season:
-        # add animated movie
-        resp_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_MOVIE_ANIM, terms))
-        response['torrents'] = response['torrents'] + resp_anim['torrents']
-    else:
-        if episode or season:  # search for animation and emission series too
-            resp_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms))
-            resp_emission = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms))
-            response['torrents'] = response['torrents'] + resp_anim['torrents'] + resp_emission['torrents']
-        if episode and _FILTER_SERIES_FULL_ == 'true':
-            terms2 = terms[:-3] + '936'
-            resp2 = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms2))
-            resp3 = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms2))
-            resp4 = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms2))
-            response['torrents'] = response['torrents'] + resp2['torrents'] + resp3['torrents'] + resp4['torrents']
+    if not len(response['torrents']):
+        if not episode and not season:
+            # add animated movie
+            resp_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_MOVIE_ANIM, terms))
+            response['torrents'] = sum([response['torrents'], resp_anim['torrents']], [])
+        else:
+            if episode or season:  # search for animation and emission series too
+                resp_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms))
+                resp_emission = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms))
+                response['torrents'] = sum([response['torrents'], resp_anim['torrents'], resp_emission['torrents']], [])
+            if not len(response['torrents']) and episode and _FILTER_SERIES_FULL_ == 'true':
+                terms2 = terms[:-3] + '936'
+                resp2 = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms2))
+                resp3 = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms2))
+                resp4 = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms2))
+                response['torrents'] = sum([response['torrents'], resp2['torrents'], resp3['torrents'], resp4['torrents']], [])
 
     for t in response['torrents']:
         # Call each individual page in parallel
@@ -183,12 +184,12 @@ def search(query, cat_id=CAT_VIDEO, terms=None, episode=False, season=False):
             "icon": _ICON_})
     return result
 
-    
+
 def search_episode(episode):
     terms = ''
     if _FILTER_SERIES_ == 'true':
         terms = get_terms()
-               
+
     provider.log.debug("Search episode : name %(title)s, season %(season)02d, episode %(episode)02d" % episode)
     if _TITLE_VF_ == 'true':
         # Get the FRENCH title from TMDB
@@ -232,7 +233,7 @@ def search_season(series):
         terms = get_terms()
 
     terms += '&term[46][]=936'  # complete season
-    
+
     if _TITLE_VF_ == 'true':
         # Get the FRENCH title from TMDB
         provider.log.debug('Get FRENCH title from TMDB for %s' % series['imdb_id'])
@@ -250,15 +251,15 @@ def search_season(series):
 
     if series['season'] < 25 or 27 < series['season'] < 31:
         real_s = int(series['season']) + 967
-        
+
     if series['season'] == 25:
         real_s = 994
-        
+
     if 25 < series['season'] < 28:
         real_s = int(series['season']) + 966
-    
+
     terms += '&term[45][]=%s' % real_s
-    
+
     return search(series['title'], CAT_SERIES, terms, season=True)
 
 
@@ -266,7 +267,7 @@ def search_movie(movie):
     terms = ''
     if _FILTER_MOVIE_ == 'true':
         terms = get_terms(False)
-               
+
     if _TITLE_VF_ == 'true':
         provider.log.debug('Get FRENCH title from TMDB for %s' % movie['imdb_id'])
         response = provider.GET(
@@ -286,12 +287,14 @@ def search_movie(movie):
 
 
 def torrent2magnet(t, q, token):
+    if _TORRENT_DETAILS_ == 'true':
+        details_url = '/torrents/details/%s' % t["id"]
+        resp_details = provider.GET('%s%s' % (_API_, details_url), headers={'Authorization': token})
+        torrent_details = resp_details.json()
     torrent_url = '/torrents/download/%s' % t["id"]
-    details_url = '/torrents/details/%s' % t["id"]
-    resp_details = provider.GET('%s%s' % (_API_, details_url), headers={'Authorization': token})
+    provider.log.info('%s%s' % (_API_, torrent_url))
     resp_torrent = provider.GET('%s%s' % (_API_, torrent_url), headers={'Authorization': token})
     torrent = resp_torrent.data
-    torrent_details = resp_details.json()
     metadata = bencode.bdecode(torrent)
     hash_contents = bencode.bencode(metadata['info'])
     hashsha1 = hashlib.sha1(hash_contents)
@@ -302,13 +305,14 @@ def torrent2magnet(t, q, token):
               'dn': urllib.quote_plus(metadata['info']['name']),
               'tr': urllib.quote_plus(metadata['announce'])}
 
-    resolution = RESOLUTION_UNKNOWN
-    if u'Vid\xe9o - Qualit\xe9' in torrent_details['terms']:
-        resolution = get_resolution(torrent_details['terms'][u'Vid\xe9o - Qualit\xe9'].encode('utf-8', 'ignore'))
-
     languages = ""
-    if u'Vid\xe9o - Langue' in torrent_details['terms']:
-        languages = torrent_details['terms'][u'Vid\xe9o - Langue'].encode('utf-8', 'ignore')
+    resolution = RESOLUTION_UNKNOWN
+
+    if _TORRENT_DETAILS_ == 'true':
+        if u'Vid\xe9o - Qualit\xe9' in torrent_details['terms']:
+            resolution = get_resolution(torrent_details['terms'][u'Vid\xe9o - Qualit\xe9'].encode('utf-8', 'ignore'))
+        if u'Vid\xe9o - Langue' in torrent_details['terms']:
+            languages = torrent_details['terms'][u'Vid\xe9o - Langue'].encode('utf-8', 'ignore')
 
     q.put({
         "uri": "magnet:?xt=%s&dn=%s&tr=%s" % (params['xt'], params['dn'], params['tr']),

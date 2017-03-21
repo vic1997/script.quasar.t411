@@ -1,3 +1,7 @@
+Version 1.5.4 :
+- Ajouts d'une option pour activer ou désactiver les infos détaillés de chaque torrent ( résolution & langue )
+- Optimisation de la vitesse de recherche
+
 Version 1.5.3 :
 - Improve magnet info
 

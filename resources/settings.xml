@@ -8,6 +8,7 @@
         <setting label="Options avancées" type="lsep"/>
         <setting label="Titre VF" type="bool" id="title_vf" default="true"/>
         <setting label="Recherche aussi saison complète (épisode)" type="bool" id="filter_series_full" default="true"/>
+        <setting label="Récupérer le détail de chaque torrent (long)" type="bool" id="torrent_details" default="false"/>
         <setting label="Nombre maximum de résultat" type="number" id="filter_limit" default="10"/>
     </category>
     <category label="Filtres - Films">
