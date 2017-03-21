@@ -1,3 +1,6 @@
+Version 1.5.5 :
+- Fix inversion episode 16 et 17
+
 Version 1.5.4 :
 - Ajouts d'une option pour activer ou désactiver les infos détaillés de chaque torrent ( résolution & langue )
 - Optimisation de la vitesse de recherche

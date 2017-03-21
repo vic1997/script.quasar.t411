@@ -17,6 +17,9 @@ Version 1.5.4 - Quasar v0.9.42
 :point_right: [Release](https://github.com/paco112/script.quasar.t411/releases/latest)
 
 ## Changelog
+Version 1.5.5 :
+- Fix inversion episode 16 et 17
+
 Version 1.5.4 :
 - Ajouts d'une option pour activer ou désactiver les infos détaillés de chaque torrent ( résolution & langue )
 - Optimisation de la vitesse de recherche

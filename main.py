@@ -216,11 +216,15 @@ def search_episode(episode):
 
     if episode['episode']:
         real_ep = ''
-        if episode['episode'] < 9:
+        if episode['episode'] == 16:
+            real_ep = 954
+        elif episode['episode'] == 17:
+            real_ep = 953
+        elif episode['episode'] < 9:
             real_ep = int(episode['episode']) + 936
-        if 8 < episode['episode'] < 31:
+        elif 8 < episode['episode'] < 31:
             real_ep = int(episode['episode']) + 937
-        if 30 < episode['episode'] < 61:
+        elif 30 < episode['episode'] < 61:
             real_ep = int(episode['episode']) + 1057
         terms += '&term[46][]=%s' % real_ep
 
@@ -251,11 +255,9 @@ def search_season(series):
 
     if series['season'] < 25 or 27 < series['season'] < 31:
         real_s = int(series['season']) + 967
-
-    if series['season'] == 25:
+    elif series['season'] == 25:
         real_s = 994
-
-    if 25 < series['season'] < 28:
+    elif 25 < series['season'] < 28:
         real_s = int(series['season']) + 966
 
     terms += '&term[45][]=%s' % real_s
