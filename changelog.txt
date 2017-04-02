@@ -1,3 +1,7 @@
+Version 1.6.0 :
+- Major Optimisation and fix stability
+- Add languages and years tags
+
 Version 1.5.5 :
 - Fix inversion episode 16 et 17
 
