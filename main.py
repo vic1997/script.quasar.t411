@@ -8,6 +8,7 @@ import xbmcaddon
 from quasar import provider
 import hashlib
 import bencode
+import re
 from threading import Thread
 import Queue
 
@@ -48,14 +49,17 @@ RESOLUTION_1080P = 3
 RESOLUTION_1440P = 4
 RESOLUTION_4K2K = 5
 
-if _API_ == 'https://api.t411.ch':
-    new_url = 'https://api.t411.li'
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:54.0) Gecko/20100101 Firefox/54.0"
+
+if not _API_ or _API_ == 'https://api.t411.ch' or _API_ == 'https://api.t411.li':
+    new_url = 'https://api.t411.ai'
     provider.ADDON.setSetting("base_url", new_url)
     _API_ = new_url
 
 
 def _init():
-    global USER_CREDENTIALS
+    global USER_CREDENTIALS, USER_CREDENTIALS_RETRY
+    USER_CREDENTIALS_RETRY = 1
     provider.log.info("Get user credentials and authenticate it, "
                       "if any credentials defined use token stored in user file")
     try:
@@ -85,7 +89,7 @@ def _auth(username, password):
 
 
 def call(method='', params=None):
-    global USER_CREDENTIALS_RETRY
+    global USER_CREDENTIALS, USER_CREDENTIALS_RETRY
     provider.log.info("Call T411 API: %s%s" % (_API_, method))
     if method != '/auth':
         token = USER_CREDENTIALS['token']
@@ -93,20 +97,27 @@ def call(method='', params=None):
         req = provider.GET('%s%s' % (_API_, method), headers={'Authorization': token})
     else:
         req = provider.POST('%s%s' % (_API_, method), data=provider.urlencode(params))
-    if req.getcode() == 200:
-        resp = req.json()
-        provider.log.info('Resp T411 API %s' % resp)
-        if 'error' in resp:
-            provider.notify(message=resp['error'].encode('utf-8', 'ignore'),
-                            header="Quasar [COLOR FF18F6F3]t411[/COLOR] Provider", time=3000, image=_ICON_)
-            if resp['code'] == 202 and method != '/auth' and USER_CREDENTIALS_RETRY > 0:
-                # Force re auth
-                USER_CREDENTIALS_RETRY -= 1
-                if _auth(_USERNAME_, _PASSWORD_):
-                    return call(method, params)
-        return resp
-    else:
-        raise Exception('Error while sending %s request: HTTP %s' % (method, req.getcode()))
+    try:
+        if req.getcode() == 200:
+            resp = req.json()
+            provider.log.info('Resp T411 API %s' % resp)
+            if 'error' in resp:
+                provider.notify(message=resp['error'].encode('utf-8', 'ignore'),
+                                header="Quasar [COLOR FF18F6F3]t411[/COLOR] Provider", time=3000, image=_ICON_)
+                if (resp['code'] == 202 or resp['code'] == 201) and method != '/auth' and USER_CREDENTIALS_RETRY > 0:
+                    # Force re auth
+                    USER_CREDENTIALS_RETRY -= 1
+                    provider.log.info('Force re auth')
+                    if _auth(_USERNAME_, _PASSWORD_):
+                        return call(method, params)
+            if 'torrents' in resp:
+                return resp['torrents']
+            return resp
+        else:
+            provider.log.error(req)
+    except Exception as e:
+        provider.log.error(e)
+    return []
 
 
 def get_terms(movie=False):
@@ -131,57 +142,71 @@ def get_terms(movie=False):
     return pref_terms
 
 
+def get_uri_torrent(torrent_id):
+    if not id:
+        return ""
+    global USER_CREDENTIALS
+    torrent_url = '/torrents/download/%s' % torrent_id
+    torrent_url = '%s%s' % (_API_, torrent_url)
+    return provider.append_headers(torrent_url, {'Authorization': USER_CREDENTIALS['token']})
+
+
 # Default Search
 def search(query, cat_id=CAT_VIDEO, terms=None, episode=False, season=False):
+    global USER_CREDENTIALS
     provider.notify(message=str(query).title(),
                     header="Quasar [COLOR FF18F6F3]t411[/COLOR] Provider", time=3000, image=_ICON_)
     result = []
-    threads = []
     search_url = '/torrents/search/%s?limit=%s&cid=%s%s'
-    q = Queue.Queue()
     provider.log.debug("QUERY : %s" % query)
     query = query.replace(' ', '%20')
-    response = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms))
-    if not len(response['torrents']):
+    torrents = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms))
+    if len(torrents) < 3:
         if not episode and not season:
             # add animated movie
-            resp_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_MOVIE_ANIM, terms))
-            response['torrents'] = sum([response['torrents'], resp_anim['torrents']], [])
+            torrents_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_MOVIE_ANIM, terms))
+            torrents = sum([torrents, torrents_anim], [])
         else:
-            if episode or season:  # search for animation and emission series too
-                resp_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms))
-                resp_emission = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms))
-                response['torrents'] = sum([response['torrents'], resp_anim['torrents'], resp_emission['torrents']], [])
-            if not len(response['torrents']) and episode and _FILTER_SERIES_FULL_ == 'true':
+            if episode and _FILTER_SERIES_FULL_ == 'true':
                 terms2 = terms[:-3] + '936'
-                resp2 = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms2))
-                resp3 = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms2))
-                resp4 = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms2))
-                response['torrents'] = sum([response['torrents'], resp2['torrents'], resp3['torrents'], resp4['torrents']], [])
+                torrents_saison = call(search_url % (query, _FILTER_LIMIT_, cat_id, terms2))
+                if not len(torrents_saison):
+                    torrents_serie_tv = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms2))
+                    if not len(torrents_serie_tv):
+                        torrents_serie_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms2))
+                        torrents = sum([torrents, torrents_serie_anim], [])
+                    else:
+                        torrents = sum([torrents, torrents_serie_tv], [])
+                else:
+                    torrents = sum([torrents, torrents_saison], [])
+            if len(torrents) < 3 and (episode or season):  # search for animation and emission series too
+                torrents_emission = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_EMISSION, terms))
+                if not len(torrents_emission):
+                    torrents_serie_anim = call(search_url % (query, _FILTER_LIMIT_, CAT_SERIES_ANIMATED, terms))
+                    torrents = sum([torrents, torrents_serie_anim], [])
+                else:
+                    torrents = sum([torrents, torrents_emission], [])
 
-    for t in response['torrents']:
-        # Call each individual page in parallel
-        thread = Thread(target=torrent2magnet, args=(t, q, USER_CREDENTIALS['token']))
-        thread.start()
-        threads.append(thread)
-
-    # And get all the results
-    for t in threads:
-        t.join()
-    while not q.empty():
-        item = q.get()
-        result.append({
-            "uri": item["uri"],
-            "size": sizeof_fmt(item["size"]),
-            "seeds": item["seeds"],
-            "peers": item["peers"],
-            "name": "[COLOR FF18F6F3]%s[/COLOR] %s" % (item["languages"], item["name"]),
-            "trackers": item["trackers"],
-            "info_hash": item["info_hash"],
-            "resolution": item["resolution"],
-            "is_private": True,
-            "provider": "t411",
-            "icon": _ICON_})
+    for torrent in torrents:
+        if 'id' in torrent:
+            torrent = torrent2magnet(torrent, USER_CREDENTIALS['token'])
+            if 'uri' in torrent:
+                result.append({
+                    "name": "[COLOR FF18F6F3]%s[/COLOR] %s" % (torrent["languages"], torrent["name"]),
+                    "provider": "t411",
+                    "icon": _ICON_,
+                    "uri": torrent["uri"],
+                    "size": sizeof_fmt(int(torrent["size"])),
+                    "seeds": torrent["seeds"],
+                    "peers": torrent["peers"],
+                    "trackers": torrent["trackers"],
+                    "info_hash": torrent["info_hash"],
+                    "resolution": torrent["resolution"],
+                    "languages": "",
+                    "is_private": True
+                })
+    provider.log.info("==> RESULT <==")
+    provider.log.info(result)
     return result
 
 
@@ -190,7 +215,7 @@ def search_episode(episode):
     if _FILTER_SERIES_ == 'true':
         terms = get_terms()
 
-    provider.log.debug("Search episode : name %(title)s, season %(season)02d, episode %(episode)02d" % episode)
+    provider.log.info("Search episode : name %(title)s, season %(season)02d, episode %(episode)02d" % episode)
     if _TITLE_VF_ == 'true':
         # Get the FRENCH title from TMDB
         provider.log.debug('Get FRENCH title from TMDB for %s' % episode['imdb_id'])
@@ -288,55 +313,82 @@ def search_movie(movie):
     return search(movie['title'], CAT_MOVIE, terms)
 
 
-def torrent2magnet(t, q, token):
-    if _TORRENT_DETAILS_ == 'true':
-        details_url = '/torrents/details/%s' % t["id"]
-        resp_details = provider.GET('%s%s' % (_API_, details_url), headers={'Authorization': token})
-        torrent_details = resp_details.json()
-    torrent_url = '/torrents/download/%s' % t["id"]
-    provider.log.info('%s%s' % (_API_, torrent_url))
-    resp_torrent = provider.GET('%s%s' % (_API_, torrent_url), headers={'Authorization': token})
-    torrent = resp_torrent.data
-    metadata = bencode.bdecode(torrent)
-    hash_contents = bencode.bencode(metadata['info'])
-    hashsha1 = hashlib.sha1(hash_contents)
-    digest = hashsha1.hexdigest()
-    # b32hash = base64.b32encode(hashsha1.digest())
-    trackers = [metadata["announce"]]
-    params = {'xt': 'urn:btih:%s' % digest,
-              'dn': urllib.quote_plus(metadata['info']['name']),
-              'tr': urllib.quote_plus(metadata['announce'])}
+def torrent2magnet(t, token):
+    try:
+        torrent_details = {}
+        if _TORRENT_DETAILS_ == 'true':
+            details_url = '/torrents/details/%s' % t["id"]
+            torrent_details = call(details_url)
+        torrent_url = '/torrents/download/%s' % t["id"]
+        provider.log.info('%s%s' % (_API_, torrent_url))
+        resp_torrent = provider.GET('%s%s' % (_API_, torrent_url), headers={'Authorization': token})
+        torrent = resp_torrent.data
+        metadata = bencode.bdecode(torrent)
+        hash_contents = bencode.bencode(metadata['info'])
+        hashsha1 = hashlib.sha1(hash_contents)
+        digest = hashsha1.hexdigest()
+        # b32hash = base64.b32encode(hashsha1.digest())
+        trackers = [metadata["announce"]]
+        params = {'xt': 'urn:btih:%s' % digest,
+                  'dn': urllib.quote_plus(metadata['info']['name']),
+                  'tr': urllib.quote_plus(metadata['announce'])}
 
-    languages = ""
-    resolution = RESOLUTION_UNKNOWN
+        name = t["name"].encode('utf-8', 'ignore')
+        languages = get_languages(name)
+        resolution = get_resolution(name)
 
-    if _TORRENT_DETAILS_ == 'true':
-        if u'Vid\xe9o - Qualit\xe9' in torrent_details['terms']:
-            resolution = get_resolution(torrent_details['terms'][u'Vid\xe9o - Qualit\xe9'].encode('utf-8', 'ignore'))
-        if u'Vid\xe9o - Langue' in torrent_details['terms']:
-            languages = torrent_details['terms'][u'Vid\xe9o - Langue'].encode('utf-8', 'ignore')
+        if _TORRENT_DETAILS_ == 'true' and 'terms' in torrent_details:
+            if u'Vid\xe9o - Qualit\xe9' in torrent_details['terms']:
+                resolution = get_resolution(
+                    torrent_details['terms'][u'Vid\xe9o - Qualit\xe9'].encode('utf-8', 'ignore')
+                )
+            if u'Vid\xe9o - Langue' in torrent_details['terms']:
+                languages = torrent_details['terms'][u'Vid\xe9o - Langue'].encode('utf-8', 'ignore')
 
-    q.put({
-        "uri": "magnet:?xt=%s&dn=%s&tr=%s" % (params['xt'], params['dn'], params['tr']),
-        "size": int(t["size"]),
-        "seeds": int(t["seeders"]),
-        "peers": int(t["leechers"]),
-        "name": t["name"].encode('utf-8', 'ignore'),
-        "trackers": trackers,
-        "info_hash": digest,
-        "resolution": resolution,
-        "languages": languages
-    })
+        return {
+            "uri": "magnet:?xt=%s&dn=%s&tr=%s" % (params['xt'], params['dn'], params['tr']),
+            "size": int(t['size']),
+            "seeds": int(t['seeders']),
+            "peers": int(t['leechers']),
+            "name": name,
+            "trackers": trackers,
+            "info_hash": digest,
+            "resolution": resolution,
+            "languages": languages
+        }
+    except Exception as e:
+        provider.log.error('Error torrent2magnet : %s' % e)
+    return {}
+
+
+def get_languages(txt):
+    lang = ""
+    if re.findall('[\s.\-_\||\[|\+]+(true)?(french|fr)|(fr[\s.\-_\||\]|\+])|(fr$)', txt, flags=re.IGNORECASE):
+        lang = "FR"
+    elif re.findall('[\s.\-_\||\[|\+]+(true)?(english|en)|(en[\s.\-_\||\]|\+])|(en$)', txt, flags=re.IGNORECASE):
+        lang = "EN"
+    elif re.findall('[\s.\-_\||\[|\+]+(multi)|(multi[\s.\-_\||\]|\+])|(multi$)', txt, flags=re.IGNORECASE):
+        lang = "MULTI"
+    if re.findall('[o|\s.\-_\||\[|\+]+st|sous[\s.\-_\||\[|\+]+titre', txt, flags=re.IGNORECASE):
+        lang = "ST %s" % lang
+    if re.findall('[\s.\-_\||\[|\+]+(vo)[s|\s.\-_\||\[|\+]+', txt, flags=re.IGNORECASE):
+        lang = "VO %s" % lang
+    if lang:
+        return "[%s]" % lang.strip()
+    return lang
 
 
 def get_resolution(txt):
+    txt = txt.upper()
     if txt.find('4k') != -1:
         return RESOLUTION_4K2K
     if txt.find('1440') != -1:
         return RESOLUTION_1440P
     if txt.find('1080') != -1:
         return RESOLUTION_1080P
-    if txt.find('720') != -1:
+    if txt.find('480P') != -1:
+        return RESOLUTION_UNKNOWN
+    if txt.find('720') != -1 or txt.find('HDTV') != -1 or txt.find('DVD') != -1:
         return RESOLUTION_720P
     return RESOLUTION_UNKNOWN
 

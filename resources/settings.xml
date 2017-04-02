@@ -9,11 +9,11 @@
         <setting label="Titre VF" type="bool" id="title_vf" default="true"/>
         <setting label="Recherche aussi saison complète (épisode)" type="bool" id="filter_series_full" default="true"/>
         <setting label="Récupérer le détail de chaque torrent (long)" type="bool" id="torrent_details" default="false"/>
-        <setting label="Nombre maximum de résultat" type="number" id="filter_limit" default="10"/>
+        <setting label="Nombre maximum de résultat" type="number" id="filter_limit" default="5"/>
     </category>
     <category label="Filtres - Films">
         <setting label="Filtrer les résultats pour les films" type="lsep"/>
-        <setting label="Activer Filtrage" type="bool" id="filter_movie" default="true"/>
+        <setting label="Activer Filtrage" type="bool" id="filter_movie" default="false"/>
         <setting label="Qualité Vidéo" type="lsep"/>
         <setting label="Rip depuis Bluray" type="lsep"/>
         <setting type="bool" enable="eq(-3,true)" label="Bluray Remux" id="17_f" default="false" />
@@ -46,7 +46,7 @@
     </category>
     <category label="Filtres - Séries">
         <setting label="Filtrer les résultats pour les séries" type="lsep"/>
-        <setting label="Activer Filtrage" type="bool" id="filter_series" default="true"/>
+        <setting label="Activer Filtrage" type="bool" id="filter_series" default="false"/>
         <setting label="Qualité Vidéo" type="lsep"/>
         <setting label="Rip depuis Bluray" type="lsep"/>
         <setting type="bool" enable="eq(-3,true)" label="Bluray Remux" id="17_s" default="false" />
