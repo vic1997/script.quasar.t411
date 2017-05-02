@@ -12,65 +12,22 @@ Version 1.5.4 - Quasar v0.9.42
 - Recherche aussi les torrents de saison complète pour un épisode
 - Recherche avec le titre VF
 
-## Download
+https://github.com/Paco112/script.quasar.t411
 
-:point_right: [Release](https://github.com/paco112/script.quasar.t411/releases/latest)
-
-## Changelog
 Version 1.6.0 :
 - Major Optimisation and fix stability
 - Add languages and years tags
 
-Version 1.5.5 :
-- Fix inversion episode 16 et 17
 
-Version 1.5.4 :
-- Ajouts d'une option pour activer ou désactiver les infos détaillés de chaque torrent ( résolution & langue )
-- Optimisation de la vitesse de recherche
+## Download
 
-Version 1.5.3 :
-- Improve magnet info
+:point_right: [Release](https://github.com/vic1997/script.quasar.t411/releases)
 
-Version 1.5.2 :
-- Fix compatibilité Quasar > 0.9.45
-- Fix movie animation recherche
-- Fix addons require
-- Fix key errors ( languages & resolutuion )
+## Changelog
 
-v1.5.1:
-- Ajouts de la langue dans le nom du torrent
-- Résolution des films plus précise
-- Ajouts d'une option pour limiter le nombre de résultat
-- Fix decode string erreur
-
-v1.5 :
-- Clean code
-- Ajouts de la catégorie "Emission TV"
-- Optimisation des recherches avec titre FR
-- Suppression du remplacement auto de la clé ( respect des règles t411 )
-
-v1.4.1 :
-- Nouvelle url
-- Ajout des films et séries d'animation
-- Fix recherche de saison avec le titre VF 
-
-v1.4 :
-- Fix pour le Raspberry Pi (#1)
-- Changement d'url t411
-
-v1.3 :
-- Recherche aussi les torrents de saison complète pour un épisode (option)
-- Nouvel icon, fanart
-
-v1.2.1 :
-- Fix recherche saison
-
-v1.2 :
-- Recherche de torrents de saison complète
-- Fix les filtres, typo
 v1.1 :
-- Support initial recherche saison complète
-- Update description, id
+- Changement des noms.
+- Changement de l'adresse URL de T411 et de l'API.
 
 v1.0 :
 - Release initiale
