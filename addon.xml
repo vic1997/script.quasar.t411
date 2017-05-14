@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.quasar.t411-paco112" name="Quasar vic1997 [COLOR FF18F6F3]t411[/COLOR] Provider" version="1.6.0" provider-name="vic1997">
+<addon id="script.quasar.t411-vic1997" name="Quasar vic1997 [COLOR FF18F6F3]t411[/COLOR] Provider" version="1.6.0" provider-name="vic1997">
   <requires>
     <import addon="plugin.video.quasar" version="0.9.42"/>
   </requires>
